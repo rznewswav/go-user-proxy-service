@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var nwApiGetUserInfoEndpoint *url.URL
+var nwApiGetUserInfoEndpoint string
 
 func init() {
 	newswavUserConfig := config.QuietBuild(NewswavUserConfig{})
@@ -26,7 +27,7 @@ func init() {
 		panic(urlJoinError)
 	}
 
-	nwApiGetUserInfoEndpoint, _ = url.Parse(joinedUrl)
+	nwApiGetUserInfoEndpoint = joinedUrl
 }
 
 func GetUserProfile(nwToken string) (
@@ -34,18 +35,29 @@ func GetUserProfile(nwToken string) (
 	profile AppUserType,
 ) {
 	logger := logger.WithContext("users")
-	request := new(http.Request)
-	request.Method = "Get"
-	request.URL = nwApiGetUserInfoEndpoint
-	request.Header = make(http.Header)
-	request.Header["platform"] = []string{"internal"}
-	request.Header["nwtoken"] = []string{nwToken}
+	request, requestInitError := http.NewRequest(
+		"GET",
+		nwApiGetUserInfoEndpoint,
+		nil,
+	)
+	if requestInitError != nil {
+		logger.Error(
+			"error at sending integration request to %s",
+			nwApiGetUserInfoEndpoint,
+			bugsnag.FromError("User Profile Request Error", requestInitError),
+		)
+		success = false
+		return
+	}
+
+	request.Header.Add("platform", "internal")
+	request.Header.Add("nwtoken", nwToken)
 
 	response, requestError := http.DefaultClient.Do(request)
 	if requestError != nil {
 		logger.Error(
 			"error at sending integration request to %s",
-			nwApiGetUserInfoEndpoint.String(),
+			nwApiGetUserInfoEndpoint,
 			bugsnag.FromError("User Profile Request Error", requestError),
 		)
 		success = false
@@ -55,7 +67,7 @@ func GetUserProfile(nwToken string) (
 	if response.StatusCode != http.StatusOK {
 		logger.Error(
 			"error at sending integration request to %s: %s",
-			nwApiGetUserInfoEndpoint.String(),
+			nwApiGetUserInfoEndpoint,
 			response.Body,
 			bugsnag.FromError("User Profile Request Error", requestError),
 		)
@@ -67,7 +79,7 @@ func GetUserProfile(nwToken string) (
 	if readErr != nil {
 		logger.Error(
 			"error at reading integration response to %s",
-			nwApiGetUserInfoEndpoint.String(),
+			nwApiGetUserInfoEndpoint,
 			bugsnag.FromError("User Profile Response Body Error", requestError),
 		)
 		success = false
@@ -88,7 +100,7 @@ func GetUserProfile(nwToken string) (
 	if unmarshalError != nil {
 		logger.Error(
 			"error at parsing integration response to json from %s",
-			nwApiGetUserInfoEndpoint.String(),
+			nwApiGetUserInfoEndpoint,
 			bugsnag.FromError("User Profile Response Body Error", unmarshalError),
 		)
 		success = false
@@ -109,7 +121,7 @@ func GetUserProfile(nwToken string) (
 	}
 
 	parsedJwt, jwtParsingError := jwt.ParseWithClaims(nwToken, &NewswavToken{}, nil)
-	if jwtParsingError != nil {
+	if jwtParsingError != nil && !errors.Is(jwtParsingError, jwt.ErrTokenUnverifiable) {
 		logger.Error(
 			"error at parsing JWT: %s",
 			nwToken,
@@ -119,15 +131,14 @@ func GetUserProfile(nwToken string) (
 		return
 	}
 
-	if claims, ok := parsedJwt.Claims.(*NewswavToken); !ok || !parsedJwt.Valid {
+	if claims, ok := parsedJwt.Claims.(*NewswavToken); !ok {
 		logger.Error(
-			"error at parsing JWT: %s, JWT is not valid",
+			"error at parsing JWT: %s, JWT payload structure is not valid",
 			nwToken,
 		)
 		success = false
 		return
 	} else {
-
 		profile = AppUserType{
 			MainLanguage:     user.MainLanguage,
 			SubLanguages:     user.SubLanguages,
