@@ -30,7 +30,7 @@ func init() {
 	nwApiGetUserInfoEndpoint = joinedUrl
 }
 
-func GetUserProfile(nwToken string) (
+var GetUserProfile = func(nwToken string) (
 	success bool,
 	profile AppUserType,
 ) {
