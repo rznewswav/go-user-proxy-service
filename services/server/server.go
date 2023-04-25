@@ -7,8 +7,9 @@ import (
 	"path"
 	"service/services/bugsnag"
 	"service/services/config"
+	"service/services/health"
 	"service/services/logger"
-	server_routes "service/services/server/routes"
+	"service/services/server/controllers"
 	"service/services/shutdown"
 	"strings"
 	"time"
@@ -41,9 +42,6 @@ func init() {
 		router.Use(cors.Default())
 		cwd, _ := os.Getwd()
 		router.Static("resources/html", path.Join(cwd, "resources/html"))
-		router.GET("resources/images/:filename", server_routes.GetResourceImage)
-		router.GET("resources/templates/:filename", server_routes.GetTemplateByName)
-		router.POST("resources/templates/:filename", server_routes.PostSaveTemplateByName)
 		logger.Info("Development mode activated, registering development routes...")
 	} else {
 		corsConfig := cors.Config{}
@@ -61,13 +59,32 @@ func init() {
 	}
 
 	// >>> all routes are registered here
-	router.GET("/api/health", server_routes.GetHealth)
-	router.GET("/", server_routes.GetHealth)
-	router.GET("/assets/:filename", server_routes.GetCovidImages)
+	registerController(health.HealthController)
 
 	server = http.Server{
 		Addr:    ":" + config.AppPort,
 		Handler: router,
+	}
+}
+
+func registerController[T any](controller controllers.Controller[T]) {
+	var handlers []gin.HandlerFunc
+	for _, middleware := range controller.Middlewares {
+		handlers = append(handlers, middleware.AsGinMiddleware())
+	}
+	handlers = append(handlers, controller.Handler.AsGinHandler())
+
+	switch controller.Method {
+	case controllers.GET:
+		router.GET(controller.Route, handlers...)
+	case controllers.POST:
+		router.POST(controller.Route, handlers...)
+	case controllers.PUT:
+		router.PUT(controller.Route, handlers...)
+	case controllers.PATCH:
+		router.PATCH(controller.Route, handlers...)
+	case controllers.DELETE:
+		router.DELETE(controller.Route, handlers...)
 	}
 }
 
