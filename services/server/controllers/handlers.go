@@ -10,7 +10,7 @@ type SetStatus func(int)
 type SetHeader func(string, string)
 
 type Handler[T any] func(
-	body Request[T],
+	Request Request[T],
 	SetStatus SetStatus,
 	SetHeader SetHeader,
 ) (Response any)
@@ -45,7 +45,11 @@ func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
 			headers.SetterFunc(),
 		)
 
-		ctx.JSON(status, responseBody)
+		if responseBody != nil {
+			ctx.JSON(status, responseBody)
+		} else {
+			ctx.Status(status)
+		}
 	}
 }
 
