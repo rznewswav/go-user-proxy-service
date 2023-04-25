@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Main",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "program": "${workspaceFolder}/cmd/main/main.go",
+        "cwd": "${workspaceFolder}",
+        "env": {
+            "LC_ALL": "en_US.UTF-8"
+        },
+      },
+      {
+        "name": "Debug Current File",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "program": "${file}",
+        "cwd": "${workspaceFolder}",
+        "env": {
+            "LC_ALL": "en_US.UTF-8"
+        },
+      },
+      {
+        "name": "Run Current File",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${file}",
+        "cwd": "${workspaceFolder}",
+        "env": {
+            "LC_ALL": "en_US.UTF-8"
+        },
+      }
+    ]
+  }

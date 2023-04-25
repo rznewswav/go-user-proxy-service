@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Code obtained from Bugsnag docs: https://docs.bugsnag.com/platforms/go/other/
+# Date: 2022-01-10 11:49
+
+# Forward signals to the app process so it terminates if
+# requested by the system
+_forward_signal() {
+    sig="$1"
+    kill -$sig "$app_pid" 2>/dev/null
+    wait $app_pid
+}
+
+_trap_signals() {
+    for sig in "$@"; do
+        trap "_forward_signal $sig" "$sig"
+    done
+}
+
+# Wait to allow potential unhandled panic requests to complete
+_at_exit() {
+    sleep 3
+}
+
+_trap_signals INT TERM
+trap _at_exit EXIT
+
+./build.exe &
+
+# Wait until the app process terminates (ensuring signals
+# can be captured)
+app_pid=$!
+wait $app_pid

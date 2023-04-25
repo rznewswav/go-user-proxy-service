@@ -1,0 +1,440 @@
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 9.5pt;
+    }
+
+
+    input {
+        border: solid 1px lightgray;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+
+    .d-flex {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .control-panel {
+        flex: 0 0 30vw;
+        display: flex;
+        flex-direction: column;
+        border: solid 1px gray;
+        border-radius: 2px;
+        height: 90vh;
+        gap: 1rem;
+        padding: 1rem;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .control-panel hr {
+        width: 100%;
+    }
+
+    .output {
+        position: relative;
+        flex: 1;
+        overflow-x: auto;
+        display: flex;
+    }
+
+    .output img {
+        height: 90vh;
+        width: auto;
+        margin: auto;
+    }
+
+    .input-with-label {
+        display: flex;
+    }
+
+    .input-with-label .label {
+        flex-basis: 18%;
+        padding: 0.2rem 1rem;
+        font-size: 9.5pt;
+        background-color: lightgrey;
+        text-align: center;
+    }
+
+    .input-with-label input {
+        flex: 1;
+        border-left: none;
+    }
+
+    .input-with-label input.double {
+        width: 33%;
+    }
+
+    .input-with-label input.rgba {
+        width: 20%;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-bold {
+        font-weight: bold;
+    }
+
+    .output .fetching {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        opacity: 0.8;
+        background-color: gray;
+        font-size: 30pt;
+    }
+</style>
+
+<body>
+    <div class="d-flex">
+        <div class="control-panel" id="control-panel">
+            <div class="input-with-label">
+                <div class="label">
+                    Config
+                </div>
+                <input type="text" placeholder="Type template name here..." id="template-name-input" />
+            </div>
+            <div class="input-with-label">
+                <div class="label">
+                    Image
+                </div>
+                <input type="text" placeholder="Insert image resource" id="template-image-input" />
+            </div>
+            <input type="button" value="(ON) Show text layout" id="debug-button" />
+            <input type="button" value="(+) Add" id="add-button" />
+        </div>
+        <div class="output">
+            <img id="output-image" src=""
+                onerror="this.src='https:\/\/dummyimage.com/600x800/6e6e6e/dedede.png&text=cannot generate image'"
+                alt="generated image" style="display: none" />
+            <div class="fetching" style="display: block" id="fetching">
+                Fetching...
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+    let resourcePath = "";
+    let currentActiveConfig = {};
+    const templateNameInput = document.getElementById("template-name-input")
+    templateNameInput.value = localStorage.getItem("template-name-input") ?? ""
+    templateNameInput.addEventListener("keydown", event => {
+        const textInputValue = templateNameInput.value ?? ""
+        localStorage.setItem("template-name-input", textInputValue)
+        if (event.key === "Enter" && textInputValue.length > 0) {
+            getTemplateConfig(textInputValue)
+        }
+    })
+
+    const outputImageDom = document.getElementById('output-image')
+    function loadImage(url) {
+        const fetchingDom = document.getElementById('fetching')
+        fetchingDom.style.display = 'block';
+
+        return new Promise((resolve, reject) => {
+            outputImageDom.onload = () => {
+                resolve(outputImageDom)
+            };
+            outputImageDom.onerror = reject;
+            outputImageDom.src = url;
+        }).finally(() => {
+            outputImageDom.style.display = 'block';
+            fetchingDom.style.display = 'none';
+        });
+    }
+
+    let debugLayout = localStorage.getItem("debugLayout") === "on"
+    const debugLayoutButtonOnText = "(ON) Show text layout"
+    const debugLayoutButtonOffText = "(OFF) Show text layout"
+    const debugLayoutButton = document.getElementById("debug-button")
+    debugLayoutButton.setAttribute('value', debugLayout ? debugLayoutButtonOnText : debugLayoutButtonOffText)
+    debugLayoutButton.addEventListener('click', function () {
+        debugLayout = !debugLayout
+        submitTemplateConfig()
+        localStorage.setItem("debugLayout", debugLayout ? "on" : "off")
+        debugLayoutButton.setAttribute('value', debugLayout ? debugLayoutButtonOnText : debugLayoutButtonOffText)
+    })
+
+
+    let debounceExecuteAt = null
+    let debounceTimeout = null
+
+    function debounceImage() {
+        debounceExecuteAt = Date.now() + 500
+        if (debounceTimeout !== null) return
+        const debounce = function () {
+            const now = Date.now()
+            if (now > debounceExecuteAt) {
+                debounceTimeout = null
+                const name = templateNameInput.value
+                const imageResource = resourceImagePathInput.value
+                if (name && imageResource) {
+                    submitTemplateConfig(name)
+                }
+            } else {
+                debounceTimeout = setTimeout(debounce, debounceExecuteAt - now)
+            }
+        }
+        debounceTimeout = setTimeout(debounce, 500)
+    }
+
+    let isSubmitting = false
+    async function submitTemplateConfig(name) {
+        if (isSubmitting) {
+            debounceImage()
+            return;
+        }
+        isSubmitting = true;
+
+        try {
+            const response = await fetch('http://localhost:3000/resources/templates/' + name, {
+                method: 'post',
+                body: JSON.stringify({
+                    ResourcePath: resourcePath,
+                    Config: currentActiveConfig,
+                }),
+                headers: {
+                    'content-type': 'application/json'
+                },
+            })
+            const imageUrl = `http://localhost:3000/resources/images/${name}?t=${Date.now()}&${debugLayout ? "debug" : ""}`
+            await loadImage(imageUrl)
+            console.log('template config updated:', {
+                status: response.status,
+                body: await response.json(),
+            })
+        } catch (error) {
+            console.error(error)
+        }
+        isSubmitting = false;
+        fetchingDom.style.display = 'none';
+    }
+
+    const resourceImagePathInput = document.getElementById('template-image-input')
+    resourceImagePathInput.addEventListener('keyup', function () {
+        const value = resourceImagePathInput.value ?? ""
+        if (resourcePath != value) debounceImage()
+        resourcePath = value
+    })
+
+    const addButton = document.getElementById('add-button')
+    addButton.addEventListener('click', function () {
+        deleteControls()
+        currentActiveConfig.push({
+            "VariableName": `{new variable ${crypto.randomUUID().split('-')[0]}}`,
+            "RelativeX": currentActiveConfig.at(-1)?.RelativeX + 0.05 || 0.5,
+            "RelativeY": currentActiveConfig.at(-1)?.RelativeY + 0.05 || 0.5,
+            "FontSize": currentActiveConfig.at(-1)?.FontSize ?? 15,
+            "MaxWidth": currentActiveConfig.at(-1)?.MaxWidth ?? 128,
+            "MaxHeight": currentActiveConfig.at(-1)?.MaxHeight ?? 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": currentActiveConfig.at(-1)?.UseFont ?? "resources/fonts/nunito-v23-latin-regular.ttf"
+        })
+        submitTemplateConfig()
+        renderControls()
+    })
+
+    async function getTemplateConfig(name) {
+        deleteControls()
+
+        templateNameInput.setAttribute("disabled", "true")
+        const config = await fetch("http://localhost:3000/resources/templates/" + name)
+        templateNameInput.removeAttribute("disabled")
+
+        if (config.status !== 200) {
+            await loadImage('https://dummyimage.com/600x800/6e6e6e/dedede.png&text=new project: insert image resource')
+            resourceImagePathInput.value = ""
+            resourcePath = ""
+            currentActiveConfig = []
+            return
+        }
+
+        const json = await config.json()
+        resourcePath = json.ResourcePath
+        currentActiveConfig = json.Config
+        await loadImage(`http://localhost:3000/resources/images/${name}?t=${Date.now()}`)
+        resourceImagePathInput.value = json.ResourcePath
+        renderControls()
+    }
+
+
+    window.onload = function () {
+        if (templateNameInput.value.length > 0) {
+            getTemplateConfig(templateNameInput.value)
+        }
+    }
+
+    function createElementFromString(html) {
+        var template = document.createElement('template');
+        html = html.trim(); // Never return a text node of whitespace as the result
+        template.innerHTML = html;
+        return template.content.firstChild;
+    }
+
+    function createInputWithLabelElement(id, label, type, value) {
+        type ??= "text"
+        value ??= ""
+
+        parentDiv = createElementFromString(`<div x-control class="input-with-label"></div>`)
+        labelDiv = document.createElement('div')
+        labelDiv.classList.add("label")
+        labelDiv.textContent = label
+        parentDiv.appendChild(labelDiv)
+
+        input = document.createElement('input')
+        input.setAttribute('type', type)
+        input.value = value
+        parentDiv.appendChild(input)
+
+        return {
+            parentDiv,
+            input,
+        }
+    }
+
+    function createMultipleInputWithLabelElement(id, label, type, values) {
+        type ??= "text"
+        values ??= []
+
+        const parentDiv = createElementFromString(`<div x-control class="input-with-label"></div>`)
+
+        const labelDiv = document.createElement('div')
+        labelDiv.classList.add("label")
+        labelDiv.textContent = label
+        parentDiv.appendChild(labelDiv)
+
+        const inputs = Array.from({ length: values.length }).map((_, i) => {
+            const input = document.createElement('input')
+            input.setAttribute('type', type)
+            input.classList.add('double')
+            input.value = values[i] ?? ""
+            parentDiv.appendChild(input)
+            return input
+        })
+
+        return {
+            parentDiv,
+            inputs,
+        }
+    }
+
+    function deleteControls() {
+        // clear all configs control
+        document.querySelectorAll('[x-control]').forEach(e => e.remove())
+    }
+
+    function removeFromArray(array, index) {
+        return [...array.slice(0, index), ...array.slice(index + 1)]
+    }
+
+    function renderControls() {
+        const controlPanelDom = document.getElementById('control-panel')
+
+        for (const configIndex in currentActiveConfig) {
+            const configObject = currentActiveConfig[configIndex]
+            console.log(configObject)
+            const hr = createElementFromString('<hr x-control />')
+            controlPanelDom.append(hr)
+
+            const deleteInput = document.createElement('input')
+            deleteInput.setAttribute('type', 'button')
+            deleteInput.setAttribute('value', '(×) Delete')
+            deleteInput.setAttribute('x-control', true)
+            deleteInput.addEventListener('click', function () {
+                currentActiveConfig = removeFromArray(currentActiveConfig, configIndex);
+                deleteControls()
+                renderControls()
+            })
+            controlPanelDom.append(deleteInput)
+
+            const VariableNameInput = createInputWithLabelElement(configIndex, 'Variable', 'text', configObject.VariableName)
+            VariableNameInput.input.addEventListener('keyup', function () {
+                const value = VariableNameInput.input.value
+                if (currentActiveConfig[configIndex].VariableName != value) debounceImage()
+                currentActiveConfig[configIndex].VariableName = value
+            })
+            controlPanelDom.append(VariableNameInput.parentDiv)
+
+            const UseFontInput = createInputWithLabelElement(configIndex, 'Font', 'text', configObject.UseFont)
+            UseFontInput.input.addEventListener('keyup', function () {
+                const value = UseFontInput.input.value
+                if (currentActiveConfig[configIndex].UseFont != value) debounceImage()
+                currentActiveConfig[configIndex].UseFont = value
+            })
+            controlPanelDom.append(UseFontInput.parentDiv)
+
+            const FontSizeInput = createInputWithLabelElement(configIndex, 'Text Size', 'number', configObject.FontSize)
+            FontSizeInput.input.addEventListener('keyup', function () {
+                const value = FontSizeInput.input.value
+                if (currentActiveConfig[configIndex].FontSize != value) debounceImage()
+                currentActiveConfig[configIndex].FontSize = +value
+            })
+            controlPanelDom.append(FontSizeInput.parentDiv)
+
+            const WxHInput = createMultipleInputWithLabelElement(configIndex, '(Max) W × H', 'number', [configObject.MaxWidth, configObject.MaxHeight])
+            WxHInput.inputs[0].addEventListener('keyup', function () {
+                const value = WxHInput.inputs[0].value
+                if (currentActiveConfig[configIndex].MaxWidth != value) debounceImage()
+                currentActiveConfig[configIndex].MaxWidth = +value
+            })
+            WxHInput.inputs[1].addEventListener('keyup', function () {
+                const value = WxHInput.inputs[1].value
+                if (currentActiveConfig[configIndex].MaxHeight != value) debounceImage()
+                currentActiveConfig[configIndex].MaxHeight = +value
+            })
+            controlPanelDom.append(WxHInput.parentDiv)
+
+            const XxYInput = createMultipleInputWithLabelElement(configIndex, '(Rel) X × Y', 'number', [configObject.RelativeX, configObject.RelativeY])
+            XxYInput.inputs[0].setAttribute('step', '0.01')
+            XxYInput.inputs[0].setAttribute('min', '0')
+            XxYInput.inputs[0].setAttribute('max', '1')
+            XxYInput.inputs[1].setAttribute('step', '0.01')
+            XxYInput.inputs[1].setAttribute('min', '0')
+            XxYInput.inputs[1].setAttribute('max', '1')
+
+            XxYInput.inputs[0].addEventListener('keyup', function () {
+                const value = XxYInput.inputs[0].value
+                if (currentActiveConfig[configIndex].RelativeX != value) debounceImage()
+                currentActiveConfig[configIndex].RelativeX = +value
+            })
+            XxYInput.inputs[1].addEventListener('keyup', function () {
+                const value = XxYInput.inputs[1].value
+                if (currentActiveConfig[configIndex].RelativeY != value) debounceImage()
+                currentActiveConfig[configIndex].RelativeY = +value
+            })
+            controlPanelDom.append(XxYInput.parentDiv)
+
+            const RGBAInput = createMultipleInputWithLabelElement(configIndex, 'RGBA', 'number', Object.values(configObject.Color))
+            const rgbaKeyNames = ['R', 'G', 'B', 'A']
+            for (const index in rgbaKeyNames) {
+                const key = rgbaKeyNames[index]
+                const input = RGBAInput.inputs[index]
+                if (!input) continue;
+                input.setAttribute('step', '1')
+                input.setAttribute('min', '0')
+                input.setAttribute('max', '255')
+                input.addEventListener('keyup', function () {
+                    const value = RGBAInput.inputs[index].value
+                    if (currentActiveConfig[configIndex].Color[key] != value) debounceImage()
+                    currentActiveConfig[configIndex].Color[key] = +value
+                })
+            }
+
+            controlPanelDom.append(RGBAInput.parentDiv)
+        }
+    }
+
+</script>

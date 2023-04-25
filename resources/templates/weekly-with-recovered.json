@@ -1,0 +1,101 @@
+{
+    "ResourcePath": "resources/images/Confirmed \u0026 Recoveries (Weekly + Total).png",
+    "Config": [
+        {
+            "VariableName": "weekly.new.cases: 4,574",
+            "RelativeX": 0.29,
+            "RelativeY": 0.485,
+            "FontSize": 90,
+            "MaxWidth": 100,
+            "MaxHeight": 80,
+            "TextAlign": 2,
+            "Color": {
+                "R": 236,
+                "G": 54,
+                "B": 53,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.recovered: 2,591",
+            "RelativeX": 0.71,
+            "RelativeY": 0.485,
+            "FontSize": 90,
+            "MaxWidth": 100,
+            "MaxHeight": 80,
+            "TextAlign": 2,
+            "Color": {
+                "R": 46,
+                "G": 193,
+                "B": 58,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.total.cases: 5,056,911",
+            "RelativeX": 0.29,
+            "RelativeY": 0.29,
+            "FontSize": 50,
+            "MaxWidth": 100,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 236,
+                "G": 54,
+                "B": 53,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.total.recovered: 5,006,680",
+            "RelativeX": 0.71,
+            "RelativeY": 0.29,
+            "FontSize": 50,
+            "MaxWidth": 100,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 46,
+                "G": 193,
+                "B": 58,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "recovery.rate: 99.01%",
+            "RelativeX": 0.665,
+            "RelativeY": 0.16,
+            "FontSize": 25,
+            "MaxWidth": 35,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.date: 02 - 08 APR 2023",
+            "RelativeX": 0.5,
+            "RelativeY": 0.878,
+            "FontSize": 70,
+            "MaxWidth": 175,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        }
+    ]
+}

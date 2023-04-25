@@ -1,0 +1,70 @@
+timeout: 1200s
+substitutions:
+  _PROJECT_NAME: image-forge-api
+  _NAMESPACE: stag-kns-nw-static
+  _CUSTOM_ZONE: asia-southeast1-b # for zonal cluster only
+  _CUSTOM_CLUSTER: staging-cluster-asse1-nw
+  _IMAGE_TAG: $COMMIT_SHA
+
+steps:
+  - name: gcr.io/kaniko-project/executor
+    id: Build
+    args:
+      - --destination=asia.gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
+      - --dockerfile=Dockerfile
+      - --cache=true
+      - --target=production
+
+  - name: "asia.gcr.io/$PROJECT_ID/helm:3.9.3"
+    id: Sync secret
+    args:
+      - upgrade
+      - "--install"
+      - "--atomic"
+      - image-forge-api-gcpsm
+      - "--namespace"
+      - $_NAMESPACE
+      - "--timeout"
+      - 15m
+      - "--history-max"
+      - "2"
+      - "-f"
+      - cloudbuild/staging/service/secret.yaml
+      - >-
+        oci://asia-southeast1-docker.pkg.dev/nw-development-329802/newswav-helm/newswav-app
+      - "--version"
+      - 0.1.0
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=$_CUSTOM_ZONE"
+      - "CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER"
+    waitFor: ["-"]
+
+  - name: "asia.gcr.io/$PROJECT_ID/helm:3.9.3" #use latest helm version, min will be v3.9
+    id: Deploy chart
+    args:
+      - upgrade
+      - "--install"
+      - $_PROJECT_NAME
+      - "--namespace"
+      - $_NAMESPACE
+      - "--timeout"
+      - 15m
+      - "--history-max"
+      - "2"
+      - "-f"
+      - cloudbuild/staging/service/values.yaml #can be different for each app
+      - "--set"
+      - image.tag=$_IMAGE_TAG
+      - >-
+        oci://asia-southeast1-docker.pkg.dev/nw-development-329802/newswav-helm/newswav-app
+      - "--version"
+      - 0.1.0
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=$_CUSTOM_ZONE"
+      - "CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER"
+    waitFor: ["Build", "Sync secret"]
+
+options:
+  machineType: "N1_HIGHCPU_8"
+logsBucket: "gs://nw-cloudbuild-logs/$_PROJECT_NAME"
+

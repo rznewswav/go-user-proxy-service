@@ -1,0 +1,597 @@
+{
+    "ResourcePath": "resources/images/States (Weekly Confirmed, Rec, Deaths).png",
+    "Config": [
+        {
+            "VariableName": "weekly.date: 02 - 08 APR 2023",
+            "RelativeX": 0.5,
+            "RelativeY": 0.94,
+            "FontSize": 45,
+            "MaxWidth": 128,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 203,
+                "G": 33,
+                "B": 33,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases: 4,574",
+            "RelativeX": 0.225,
+            "RelativeY": 0.74,
+            "FontSize": 45,
+            "MaxWidth": 60,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 225,
+                "G": 59,
+                "B": 50,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.recovered: 2,591",
+            "RelativeX": 0.5,
+            "RelativeY": 0.74,
+            "FontSize": 45,
+            "MaxWidth": 60,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 49,
+                "G": 197,
+                "B": 55,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths: 12",
+            "RelativeX": 0.775,
+            "RelativeY": 0.74,
+            "FontSize": 45,
+            "MaxWidth": 60,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "recovery.rate: 99.01%",
+            "RelativeX": 0.89,
+            "RelativeY": 0.038,
+            "FontSize": 21,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.johor: 9",
+            "RelativeX": 0.232,
+            "RelativeY": 0.627,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.johor: 144",
+            "RelativeX": 0.18,
+            "RelativeY": 0.532,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.kedah: 9",
+            "RelativeX": 0.452,
+            "RelativeY": 0.627,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.kedah: 169",
+            "RelativeX": 0.392,
+            "RelativeY": 0.532,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.kelantan: 9",
+            "RelativeX": 0.662,
+            "RelativeY": 0.627,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.kelantan: 208",
+            "RelativeX": 0.603,
+            "RelativeY": 0.532,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.melaka: 9",
+            "RelativeX": 0.873,
+            "RelativeY": 0.626,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.melaka: 547",
+            "RelativeX": 0.815,
+            "RelativeY": 0.532,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.nsembilan: 9",
+            "RelativeX": 0.233,
+            "RelativeY": 0.484,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.nsembilan: 144",
+            "RelativeX": 0.18,
+            "RelativeY": 0.387,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.pahang: 9",
+            "RelativeX": 0.451,
+            "RelativeY": 0.485,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.pahang: 169",
+            "RelativeX": 0.392,
+            "RelativeY": 0.387,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.perak: 9",
+            "RelativeX": 0.662,
+            "RelativeY": 0.485,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.perak: 208",
+            "RelativeX": 0.603,
+            "RelativeY": 0.387,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.perlis: 9",
+            "RelativeX": 0.873,
+            "RelativeY": 0.481,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.perlis: 547",
+            "RelativeX": 0.815,
+            "RelativeY": 0.387,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.pinang: 9",
+            "RelativeX": 0.233,
+            "RelativeY": 0.335,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.pinang: 144",
+            "RelativeX": 0.18,
+            "RelativeY": 0.24000000000000005,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.sabah: 9",
+            "RelativeX": 0.448,
+            "RelativeY": 0.335,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.sabah: 169",
+            "RelativeX": 0.396,
+            "RelativeY": 0.24,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.sarawak: 9",
+            "RelativeX": 0.666,
+            "RelativeY": 0.338,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.sarawak: 208",
+            "RelativeX": 0.608,
+            "RelativeY": 0.24,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.selangor: 9",
+            "RelativeX": 0.875,
+            "RelativeY": 0.335,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.selangor: 547",
+            "RelativeX": 0.815,
+            "RelativeY": 0.24,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.terengganu: 9",
+            "RelativeX": 0.236,
+            "RelativeY": 0.192,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.terengganu: 144",
+            "RelativeX": 0.18,
+            "RelativeY": 0.09300000000000005,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.kl: 9",
+            "RelativeX": 0.452,
+            "RelativeY": 0.19,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.kl: 169",
+            "RelativeX": 0.396,
+            "RelativeY": 0.093,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.labuan: 9",
+            "RelativeX": 0.659,
+            "RelativeY": 0.19100000000000003,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.labuan: 208",
+            "RelativeX": 0.608,
+            "RelativeY": 0.093,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.deaths.putrajaya: 9",
+            "RelativeX": 0.875,
+            "RelativeY": 0.18800000000000003,
+            "FontSize": 21,
+            "MaxWidth": 8,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        },
+        {
+            "VariableName": "weekly.new.cases.putrajaya: 547",
+            "RelativeX": 0.815,
+            "RelativeY": 0.093,
+            "FontSize": 34,
+            "MaxWidth": 30,
+            "MaxHeight": 18,
+            "TextAlign": 2,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 255
+            },
+            "UseFont": "resources/fonts/league-spartan/LeagueSpartan-Bold.ttf"
+        }
+    ]
+}

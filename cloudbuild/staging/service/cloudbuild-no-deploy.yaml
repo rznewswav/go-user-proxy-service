@@ -1,0 +1,20 @@
+timeout: 1200s
+substitutions:
+  _PROJECT_NAME: image-forge-api
+  _NAMESPACE: stag-kns-nw-static
+  _CUSTOM_ZONE: asia-southeast1-b # for zonal cluster only
+  _CUSTOM_CLUSTER: staging-cluster-asse1-nw
+  _IMAGE_TAG: $COMMIT_SHA
+
+steps:
+  - name: gcr.io/kaniko-project/executor
+    id: Build
+    args:
+      - --destination=asia.gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
+      - --dockerfile=Dockerfile
+      - --cache=true
+      - --target=production
+
+options:
+  machineType: "N1_HIGHCPU_8"
+logsBucket: "gs://nw-cloudbuild-logs/$_PROJECT_NAME"

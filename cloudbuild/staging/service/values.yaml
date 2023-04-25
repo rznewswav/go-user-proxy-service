@@ -1,0 +1,84 @@
+#DEPLOYMENT
+fullnameOverride: image-forge-api
+nameOverride: image-forge-api
+replicaCount: 2
+targetVersion: unversioned
+tier: backend
+
+image:
+  repository: asia.gcr.io/nw-development-329802/image-forge-api
+  tag: develop
+  pullPolicy: Always
+appContainerPort: 3000
+
+resources:
+  limits:
+    memory: 500M
+    cpu: '250m'
+  requests:
+    memory: 250M
+    cpu: '100m'
+
+startupProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  failureThreshold: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+livenessProbe: {}
+
+envFrom:
+  - configMapRef:
+      name: image-forge-api-configmap
+  - secretRef:
+      name: image-forge-api-gcpsm
+
+nodeSelector:
+  cloud.google.com/gke-spot: "true"
+
+#SERVICE
+service:
+  enabled: true
+  type: NodePort
+  port: 3000
+
+#INGRESS
+ingress:
+  enabled: true
+  tls:
+    - hosts:
+        - dev-image-forge-api.newswav.dev
+      secretName: dev-tls-secret
+  hosts:
+    - host: dev-image-forge-api.newswav.dev
+      paths:
+        - path: /
+          pathType: Prefix
+
+#CONFIGMAP
+configmap:
+  enabled: true
+  configmaps:
+    - name: image-forge-api-configmap
+      data:
+        APP_ENV: staging
+        NODE_ENV: staging
+        LOG_PRETTIFY: "0"
+        APP_NAME: image-forge-api
+        REDIS_HOST: redis-store-service.stag-kns-nw-static.svc.cluster.local
+        REDIS_PORT: "6379"
+        CORS_DOMAINS: http://localhost:8080,https://dev-newswav-dashboard.newswav.dev,https://dev-website.newswav.dev
+
+#HPA
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
