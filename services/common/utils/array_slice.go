@@ -9,7 +9,7 @@ func ArraySlice[T any](arr []T, from, until int) []T {
 		until = len(arr) + until
 	}
 
-	if until >= len(arr) {
+	if until > len(arr) {
 		until = len(arr) - 1
 	}
 
