@@ -2,5 +2,12 @@
   "editor.formatOnSave": true,
   "go.testEnvVars": {
     "CWD": "${workspaceFolder}"
+  },
+  "rest-client.environmentVariables": {
+    "$shared": {},
+    "local": {
+      "host": "127.0.0.1:3000",
+    },
+    "production": {}
   }
 }
