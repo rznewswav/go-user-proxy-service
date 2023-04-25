@@ -7,11 +7,9 @@ import (
 	"path"
 	"service/services/bugsnag"
 	"service/services/config"
-	"service/services/health"
 	"service/services/logger"
 	"service/services/server/controllers"
 	"service/services/shutdown"
-	"service/services/users"
 	"strings"
 	"time"
 
@@ -60,8 +58,7 @@ func init() {
 	}
 
 	// >>> all routes are registered here
-	registerController(health.HealthController)
-	registerController(users.GetProfileInfo)
+	registerRoutes()
 
 	server = http.Server{
 		Addr:    ":" + config.AppPort,
