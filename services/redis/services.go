@@ -19,7 +19,7 @@ var initExecError error
 var onFinishedShutdown func()
 
 func AddKeyPrefix(key string) string {
-	return fmt.Sprintf("image-forge:%s", key)
+	return fmt.Sprintf("user-proxy:%s", key)
 }
 
 func Connect(shutdownHandler *shutdown.ShutdownHandler) {
