@@ -4,8 +4,11 @@ go 1.19
 
 require (
 	github.com/bugsnag/bugsnag-go/v2 v2.2.0
+	github.com/go-sql-driver/mysql v1.7.0
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mariomac/gostream v0.8.1
+	github.com/redis/go-redis/v9 v9.0.3
 	github.com/stretchr/testify v1.8.2
 	github.com/tdewolff/canvas v0.0.0-20230413035520-7ad0927f45dd
 	github.com/vansante/go-event-emitter v1.0.2
@@ -16,8 +19,6 @@ require (
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/redis/go-redis/v9 v9.0.3 // indirect
 )
 
 require (
@@ -34,7 +35,7 @@ require (
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.0 // indirect
+	github.com/gin-gonic/gin v1.9.0
 	github.com/go-fonts/latin-modern v0.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -61,7 +62,7 @@ require (
 	golang.org/x/image v0.6.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/text v0.8.0
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	star-tex.org/x/tex v0.4.0 // indirect
