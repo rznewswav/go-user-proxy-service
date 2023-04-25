@@ -17,7 +17,7 @@ import (
 var cwd = ""
 
 func GetStackTrace() []bugsnag.StackFrame {
-	err := bnErrors.New("", 1)
+	err := bnErrors.New("", 0)
 	sf := err.StackFrames()
 
 	stackFrameStream := stream.OfSlice(sf)
@@ -43,7 +43,7 @@ func GetStackTrace() []bugsnag.StackFrame {
 	).ToSlice()
 }
 
-func Init() {
+func init() {
 	logger := log.New(os.Stderr, "STACK", log.LstdFlags)
 
 	if wd, err := os.Getwd(); err != nil {
