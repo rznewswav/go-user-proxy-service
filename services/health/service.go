@@ -2,7 +2,7 @@ package health
 
 import (
 	"context"
-	"errors"
+	"github.com/pkg/errors"
 	"service/services/logger"
 	"time"
 )
@@ -22,7 +22,7 @@ type SystemHealthStatus struct {
 	Patients map[string]PatientHealthStatus
 }
 
-var Patients = []Patient{}
+var Patients []Patient
 
 var SystemHealth = SystemHealthStatus{
 	Healthy:  false,

@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
-
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 var router *gin.Engine
@@ -38,10 +38,10 @@ func logErrorRequests() gin.HandlerFunc {
 		var contextError = c.Errors.ByType(gin.ErrorTypePrivate)
 		if statusCode >= 500 {
 			loggerFn = logger.Error
-			err = fmt.Errorf("request returned server error")
+			err = errors.New("request returned server error")
 		} else if len(contextError) > 0 {
 			loggerFn = logger.Error
-			err = fmt.Errorf("request returned context error: %s", contextError.String())
+			err = errors.Errorf("request returned context error: %s", contextError.String())
 		}
 
 		latency := time.Now().Sub(start)
