@@ -10,7 +10,7 @@ var ConcatenateProfileInfo = controllers.C[map[string]interface{}]().
 		SetStatus controllers.SetStatus,
 		SetHeader controllers.SetHeader,
 	) (Response any) {
-		profile, _ := request.Context().Get(UserProfileToken)
+		profile, _ := request.Get(UserProfileToken)
 		return map[string]interface{}{
 			"profile": profile,
 			"body":    request.Body(),

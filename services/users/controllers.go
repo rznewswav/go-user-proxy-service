@@ -20,6 +20,6 @@ var AuthMiddleware controllers.Handler[any] = func(
 		return false
 	}
 
-	body.Context().Set(UserProfileToken, profile)
+	body.Set(UserProfileToken, profile)
 	return
 }
