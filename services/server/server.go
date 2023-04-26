@@ -62,12 +62,14 @@ func init() {
 }
 
 func registerController[T any](controller controllers.Controller[T]) {
+	l := logger.WithContext("server")
 	var handlers []gin.HandlerFunc
 	for _, middleware := range controller.Middlewares {
 		handlers = append(handlers, middleware.AsGinMiddleware())
 	}
 	handlers = append(handlers, controller.Handler.AsGinHandler())
 
+	l.Info("%*s %*s --> %s", 5, controller.Method, 32, controller.Route, controller.HandlerTrace)
 	switch controller.Method {
 	case controllers.GET:
 		router.GET(controller.Route, handlers...)

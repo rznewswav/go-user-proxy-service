@@ -1,10 +1,17 @@
 package controllers
 
+import (
+	"fmt"
+	"service/services/common/utils"
+	"service/services/stack"
+)
+
 type Controller[T any] struct {
-	Route       string
-	Method      Method
-	Middlewares []Handler[any]
-	Handler     Handler[T]
+	Route        string
+	Method       Method
+	Middlewares  []Handler[any]
+	Handler      Handler[T]
+	HandlerTrace string
 }
 
 func NewController[T any]() Controller[T] {
@@ -56,6 +63,13 @@ func (c Controller[T]) ResetMiddleware(handler Handler[any]) Controller[T] {
 }
 
 func (c Controller[T]) Handle(Handler Handler[T]) Controller[T] {
+	trace := stack.GetStackTrace()
+	firstOfTrace := utils.ArrayGetOrNil(trace, 0)
+	if firstOfTrace != nil {
+		c.HandlerTrace = fmt.Sprintf("%s:%d", firstOfTrace.File, firstOfTrace.LineNumber)
+	} else {
+		c.HandlerTrace = ""
+	}
 	c.Handler = Handler
 	return c
 }
