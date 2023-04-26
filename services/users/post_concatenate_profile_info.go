@@ -4,7 +4,7 @@ import "service/services/server/controllers"
 
 var ConcatenateProfileInfo = controllers.C[map[string]interface{}]().
 	Post("/api/v1/me").
-	UseMiddleware(AuthMiddleware).
+	UseMiddleware(&AuthMiddleware).
 	Handle(func(
 		request controllers.Request[map[string]interface{}],
 		SetStatus controllers.SetStatus,

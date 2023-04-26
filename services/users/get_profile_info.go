@@ -4,7 +4,7 @@ import "service/services/server/controllers"
 
 var GetProfileInfo = controllers.C[any]().
 	Get("/api/v1/me").
-	UseMiddleware(AuthMiddleware).
+	UseMiddleware(&AuthMiddleware).
 	Handle(func(
 		body controllers.Request[any],
 		SetStatus controllers.SetStatus,

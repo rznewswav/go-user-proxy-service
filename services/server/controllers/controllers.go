@@ -9,7 +9,7 @@ import (
 type Controller[T any] struct {
 	Route        string
 	Method       Method
-	Middlewares  []Handler[any]
+	Middlewares  []*Handler[any]
 	Handler      Handler[T]
 	HandlerTrace string
 }
@@ -52,13 +52,13 @@ func (c Controller[T]) Delete(Route string) Controller[T] {
 	return c
 }
 
-func (c Controller[T]) UseMiddleware(handler Handler[any]) Controller[T] {
+func (c Controller[T]) UseMiddleware(handler *Handler[any]) Controller[T] {
 	c.Middlewares = append(c.Middlewares, handler)
 	return c
 }
 
 func (c Controller[T]) ResetMiddleware() Controller[T] {
-	c.Middlewares = make([]Handler[any], 0)
+	c.Middlewares = make([]*Handler[any], 0)
 	return c
 }
 
@@ -77,6 +77,7 @@ func (c Controller[T]) Handle(Handler Handler[T]) Controller[T] {
 func (c Controller[T]) Clone() (newController Controller[T]) {
 	newController.Route = c.Route
 	newController.Method = c.Method
+	newController.Middlewares = make([]*Handler[any], len(c.Middlewares))
 	copy(newController.Middlewares, c.Middlewares)
 	newController.Handler = c.Handler
 	return
