@@ -1,5 +1,7 @@
 package controllers
 
+import "net/http"
+
 type MockController[T any] struct {
 	Controller[T]
 }
@@ -21,4 +23,57 @@ func (mc MockController[T]) ReplaceMiddleware(
 		}
 	}
 	return mc
+}
+
+type MockConfig struct {
+	Key   string
+	Value string
+}
+
+type MockAddHeader MockConfig
+type MockBody any
+
+func (mc MockController[T]) SendMockRequest(opt ...any) (
+	response any,
+	status int,
+	header Headers,
+) {
+	status = http.StatusOK
+
+	var body T
+	var headers Headers
+
+	for _, castable := range opt {
+		switch casted := castable.(type) {
+		case MockBody:
+			body = casted.(T)
+		case MockAddHeader:
+			headers.Set(casted.Key, casted.Value)
+		}
+	}
+
+	requestForMiddie := WrapRequestMockBody[any](body)
+	for _, middleware := range mc.Middlewares {
+		response = (*middleware)(
+			requestForMiddie,
+			func(i int) {
+				status = i
+			},
+			header.SetterFunc(),
+		)
+
+		if response != nil {
+			return
+		}
+	}
+
+	request := WrapRequestMockBody[T](body)
+	response = mc.Handler(
+		request,
+		func(i int) {
+			status = i
+		},
+		header.SetterFunc(),
+	)
+	return
 }
