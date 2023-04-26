@@ -1,8 +1,11 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
+)
 
-// A stripped down version of gin.Context.
+// Request A stripped down version of gin.Context.
 //
 // All response functions are hidden from
 type Request[Body any] interface {
@@ -12,14 +15,38 @@ type Request[Body any] interface {
 
 type RequestStruct[Body any] struct {
 	Request[Body]
-	body    Body
-	context *gin.Context
+	Body    func() Body
+	Context func() *gin.Context
 }
 
-func (r RequestStruct[Body]) Body() Body {
-	return r.body
+func WrapRequest[T any](ctx *gin.Context) Request[T] {
+	var bindable T
+	request := RequestStruct[T]{
+		Body: func() T {
+			return bindable
+		},
+		Context: func() *gin.Context {
+			return ctx
+		},
+	}
+	request.Request = request
+	return request
 }
 
-func (r RequestStruct[Body]) Context() *gin.Context {
-	return r.context
+func WrapRequestBindBody[T any](ctx *gin.Context) (Request[T], error) {
+	var bindable T
+	bindError := ctx.ShouldBind(&bindable)
+	if bindError != nil {
+		return nil, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
+	}
+	request := RequestStruct[T]{
+		Body: func() T {
+			return bindable
+		},
+		Context: func() *gin.Context {
+			return ctx
+		},
+	}
+	request.Request = request
+	return request, nil
 }

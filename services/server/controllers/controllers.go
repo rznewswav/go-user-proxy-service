@@ -64,7 +64,7 @@ func (c Controller[T]) ResetMiddleware() Controller[T] {
 
 func (c Controller[T]) Handle(Handler Handler[T]) Controller[T] {
 	trace := stack.GetStackTrace()
-	firstOfTrace := utils.ArrayGetOrNil(trace, 0)
+	firstOfTrace := utils.ArrayGetOrNil(trace, 2)
 	if firstOfTrace != nil {
 		c.HandlerTrace = fmt.Sprintf("%s:%d", firstOfTrace.File, firstOfTrace.LineNumber)
 	} else {

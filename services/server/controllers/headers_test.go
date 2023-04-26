@@ -14,7 +14,7 @@ func TestSetHeaders(t *testing.T) {
 	if !assert.NotNil(t, h.H) {
 		return
 	}
-	assert.Contains(t, (*h.H), "hello")
+	assert.Contains(t, *h.H, "hello")
 	assert.Equal(t, (*h.H)["hello"], "world")
 }
 

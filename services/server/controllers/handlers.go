@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,23 +16,30 @@ type Handler[T any] func(
 	SetHeader SetHeader,
 ) (Response any)
 
+var RespServiceUnavailableDefault = gin.H{
+	"status": false,
+	"data":   gin.H{},
+}
+
+var RespRequestBodyMalformed = gin.H{
+	"status": false,
+	"data": gin.H{
+		"message": "Your request body is not a valid JSON body.",
+		"code":    "INVALID_JSON_BODY",
+	},
+}
+
 func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var bindable T
-		bindError := ctx.ShouldBind(&bindable)
-		if bindError != nil {
-			ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-				"status": false,
-				"error": gin.H{
-					"code": "BAD_REQUEST_BODY",
-				},
-			})
-			return
-		}
-
-		requestObject := RequestStruct[T]{
-			body:    bindable,
-			context: ctx,
+		requestObject, wrapError := WrapRequestBindBody[T](ctx)
+		if wrapError != nil {
+			if errors.Is(wrapError, ErrCannotProcessReqBody) {
+				ctx.JSON(http.StatusUnprocessableEntity, RespRequestBodyMalformed)
+				return
+			} else {
+				ctx.JSON(http.StatusServiceUnavailable, RespServiceUnavailableDefault)
+				return
+			}
 		}
 
 		var status = http.StatusOK
@@ -55,11 +63,7 @@ func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
 
 func (s Handler[T]) AsGinMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var nilable T
-		requestObject := RequestStruct[T]{
-			body:    nilable,
-			context: ctx,
-		}
+		requestObject := WrapRequest[T](ctx)
 
 		var status = http.StatusOK
 		var headers Headers
