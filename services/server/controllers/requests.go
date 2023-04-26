@@ -8,20 +8,15 @@ import (
 // Request A stripped down version of gin.Context.
 //
 // All response functions are hidden from
-type Request[Body any] interface {
-	Body() Body
-	Context() *gin.Context
-}
 
-type RequestStruct[Body any] struct {
-	Request[Body]
+type Request[Body any] struct {
 	Body    func() Body
 	Context func() *gin.Context
 }
 
 func WrapRequest[T any](ctx *gin.Context) Request[T] {
 	var bindable T
-	request := RequestStruct[T]{
+	request := Request[T]{
 		Body: func() T {
 			return bindable
 		},
@@ -29,17 +24,16 @@ func WrapRequest[T any](ctx *gin.Context) Request[T] {
 			return ctx
 		},
 	}
-	request.Request = request
 	return request
 }
 
-func WrapRequestBindBody[T any](ctx *gin.Context) (Request[T], error) {
+func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
 	var bindable T
 	bindError := ctx.ShouldBind(&bindable)
 	if bindError != nil {
-		return nil, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
+		return r, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
 	}
-	request := RequestStruct[T]{
+	request := Request[T]{
 		Body: func() T {
 			return bindable
 		},
@@ -47,6 +41,5 @@ func WrapRequestBindBody[T any](ctx *gin.Context) (Request[T], error) {
 			return ctx
 		},
 	}
-	request.Request = request
 	return request, nil
 }
