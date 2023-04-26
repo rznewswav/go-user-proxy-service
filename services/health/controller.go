@@ -27,7 +27,7 @@ var HealthController = controllers.C[any]().
 		return isHealthy
 	})
 
-// Use for endpoints that require other services to be ready before handling requests
+// HealthMiddleware Use for endpoints that require other services to be ready before handling requests
 var HealthMiddleware controllers.Handler[any] = func(
 	body controllers.Request[any],
 	SetStatus controllers.SetStatus,
