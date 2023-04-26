@@ -40,6 +40,14 @@ func (s *Headers) Get(key string) (value string) {
 	return
 }
 
+func (s *Headers) Has(key string) (exists bool) {
+	s.AssignMapIfNil()
+
+	unreffedMap := *s.H
+	_, exists = unreffedMap[key]
+	return
+}
+
 func (s *Headers) ForEach(iterator func(string, string)) {
 	s.AssignMapIfNil()
 
