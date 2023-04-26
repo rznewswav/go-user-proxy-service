@@ -24,13 +24,8 @@ var server http.Server
 func init() {
 	logger := logger.WithContext("server")
 	config := config.QuietBuild(ServerConfig{})
-	if config.AppEnv != "staging" && config.AppEnv != "production" {
-		gin.SetMode(gin.DebugMode)
-		router = gin.New()
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-		router = gin.New()
-	}
+	gin.SetMode(gin.ReleaseMode)
+	router = gin.New()
 
 	router.Use(
 		gin.LoggerWithWriter(gin.DefaultWriter, "/api/health", "/"),
