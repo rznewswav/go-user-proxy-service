@@ -12,6 +12,9 @@ type PrettyTransformers struct{}
 
 const unableToMarshalPrettyTemplate = "(unable to marshal object: %s)"
 
+var maxFileNameLength = 31
+var maxContextLength = 8
+
 func (transformer *PrettyTransformers) Transform(
 	obj logger_structs.LogObject,
 ) string {
@@ -51,15 +54,28 @@ func (transformer *PrettyTransformers) Transform(
 			marshalledPayload = string(y)
 		}
 	}
+
+	maxFileNameLength = maxOfInt(maxFileNameLength, len(fileName))
+	maxContextLength = maxOfInt(maxContextLength, len(context))
 	return fmt.Sprintf(
-		"%s %s \u001b[0;33m(%s)\u001b[0m %s%s%s",
+		"%s %*s \u001b[0;33m%*s\u001b[0m %s%s%s",
 		level,
+		maxFileNameLength,
 		fileName,
+		maxContextLength,
 		context,
 		message+"\n",
 		marshalledPayload,
 		verboseStack,
 	)
+}
+
+func maxOfInt(a, b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
 }
 
 func (transformer *PrettyTransformers) Debug() string {
