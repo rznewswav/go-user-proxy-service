@@ -1,11 +1,10 @@
 package logger_transformers
 
 import (
+	"encoding/json"
 	"fmt"
 	logger_structs "service/services/logger/structs"
 	stack "service/services/stack"
-
-	"gopkg.in/yaml.v2"
 )
 
 type PrettyTransformers struct{}
@@ -44,7 +43,7 @@ func (transformer *PrettyTransformers) Transform(
 	marshalledPayload := ""
 
 	if obj.Payload != nil {
-		y, err := yaml.Marshal(obj.Payload)
+		y, err := json.MarshalIndent(obj.Payload, "", "  ")
 		if err != nil {
 			marshalledPayload = fmt.Sprintf(
 				unableToMarshalPrettyTemplate,
