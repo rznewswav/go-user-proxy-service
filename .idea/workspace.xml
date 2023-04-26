@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="634aa17c-b03d-42ec-a3ea-982846d4dd66" name="Changes" comment="Prettify log with pad string start">
-      <change beforePath="$PROJECT_DIR$/services/common/utils/get_function_name.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/common/utils/get_function_name.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/health/controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/health/controller.go" afterDir="false" />
+    <list default="true" id="634aa17c-b03d-42ec-a3ea-982846d4dd66" name="Changes" comment="Add http env for idea">
+      <change beforePath="$PROJECT_DIR$/services/server/controllers/controllers.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controllers/controllers.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +89,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1682472605003</updated>
-      <workItem from="1682472607070" duration="2080000" />
+      <workItem from="1682472607070" duration="2198000" />
     </task>
     <task id="LOCAL-00001" summary="Add .idea">
       <created>1682474534090</created>
@@ -141,7 +140,28 @@
       <option name="project" value="LOCAL" />
       <updated>1682474687680</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Apply lint fixes">
+      <created>1682476378467</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1682476378467</updated>
+    </task>
+    <task id="LOCAL-00009" summary=".idea artifacts">
+      <created>1682476386278</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1682476386278</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add http env for idea">
+      <created>1682476397116</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1682476397116</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,7 +174,10 @@
     <MESSAGE value="Remove gin mode debug" />
     <MESSAGE value="Log route and method on register controller" />
     <MESSAGE value="Prettify log with pad string start" />
-    <option name="LAST_COMMIT_MESSAGE" value="Prettify log with pad string start" />
+    <MESSAGE value="Apply lint fixes" />
+    <MESSAGE value=".idea artifacts" />
+    <MESSAGE value="Add http env for idea" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add http env for idea" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
