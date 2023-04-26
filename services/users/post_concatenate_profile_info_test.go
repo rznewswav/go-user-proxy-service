@@ -21,7 +21,17 @@ func TestConcatenateProfileInfo(t *testing.T) {
 	}
 
 	mockController.ReplaceMiddleware(&AuthMiddleware, &MockUserInfo)
-	response, status, _ := mockController.SendMockRequest()
+	response, status, _ := mockController.SendMockRequest(
+		controllers.MockBody(map[string]interface{}{"hello": "world"}),
+	)
 	assert.Equal(t, http.StatusOK, status)
+	assert.Contains(t, response, "body")
+	body := response.(map[string]interface{})["body"]
+	assert.Contains(t, body, "hello")
+	hello := body.(map[string]interface{})["hello"]
+	assert.Equal(t, hello, "world")
+
 	assert.Contains(t, response, "profile")
+	profile := response.(map[string]interface{})["profile"]
+	assert.Equal(t, userProfileValue, profile)
 }
