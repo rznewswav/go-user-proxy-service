@@ -57,7 +57,7 @@ func (c Controller[T]) UseMiddleware(handler Handler[any]) Controller[T] {
 	return c
 }
 
-func (c Controller[T]) ResetMiddleware(handler Handler[any]) Controller[T] {
+func (c Controller[T]) ResetMiddleware() Controller[T] {
 	c.Middlewares = make([]Handler[any], 0)
 	return c
 }
