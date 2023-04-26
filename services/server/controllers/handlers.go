@@ -29,7 +29,7 @@ var RespRequestBodyMalformed = gin.H{
 	},
 }
 
-func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
+func (h Handler[T]) AsGinHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		requestObject, wrapError := WrapRequestBindBody[T](ctx)
 		if wrapError != nil {
@@ -45,7 +45,7 @@ func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
 		var status = http.StatusOK
 		var headers Headers
 
-		responseBody := s(
+		responseBody := h(
 			requestObject,
 			func(s int) {
 				status = s
@@ -61,14 +61,14 @@ func (s Handler[T]) AsGinHandler() gin.HandlerFunc {
 	}
 }
 
-func (s Handler[T]) AsGinMiddleware() gin.HandlerFunc {
+func (h Handler[T]) AsGinMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		requestObject := WrapRequest[T](ctx)
 
 		var status = http.StatusOK
 		var headers Headers
 
-		responseBody := s(
+		responseBody := h(
 			requestObject,
 			func(s int) {
 				status = s
