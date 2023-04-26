@@ -10,10 +10,14 @@ import (
 // All response functions are hidden from
 
 type Request[Body any] struct {
-	Body    func() Body
+	Body func() Body
+	// Deprecated: Request.Context is not mockable.
+	// You are encouraged to use the predefined functions
+	// or to extend the Request struct instead.
 	Context func() *gin.Context
 	Get     func(key string) (value any, exists bool)
 	Set     func(key string, value any)
+	Header  func(key string) string
 }
 
 func WrapRequest[T any](ctx *gin.Context) Request[T] {
@@ -32,6 +36,9 @@ func WrapRequest[T any](ctx *gin.Context) Request[T] {
 		Set: func(key string, value any) {
 			ctx.Set(key, value)
 		},
+		Header: func(key string) string {
+			return ctx.GetHeader(key)
+		},
 	}
 	return request
 }
@@ -49,8 +56,11 @@ func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
 	return request, nil
 }
 
-func WrapRequestMockBody[T any](mockBody T) Request[T] {
-	ctx := make(map[string]interface{})
+func WrapRequestMockBody[T any](
+	mockBody T,
+	ctx map[string]interface{},
+	requestHeaders *Headers,
+) Request[T] {
 	request := Request[T]{
 		Body: func() T {
 			return mockBody
@@ -64,6 +74,9 @@ func WrapRequestMockBody[T any](mockBody T) Request[T] {
 		},
 		Set: func(key string, value any) {
 			ctx[key] = value
+		},
+		Header: func(key string) string {
+			return requestHeaders.Get(key)
 		},
 	}
 	return request

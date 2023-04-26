@@ -41,18 +41,23 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 	status = http.StatusOK
 
 	var body T
-	var headers Headers
+	var requestHeaders Headers
 
 	for _, castable := range opt {
 		switch casted := castable.(type) {
 		case MockBody:
 			body = casted.(T)
 		case MockAddHeader:
-			headers.Set(casted.Key, casted.Value)
+			requestHeaders.Set(casted.Key, casted.Value)
 		}
 	}
 
-	requestForMiddie := WrapRequestMockBody[any](body)
+	ctx := make(map[string]interface{})
+	requestForMiddie := WrapRequestMockBody[any](
+		body,
+		ctx,
+		&requestHeaders,
+	)
 	for _, middleware := range mc.Middlewares {
 		response = (*middleware)(
 			requestForMiddie,
@@ -67,7 +72,11 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 		}
 	}
 
-	request := WrapRequestMockBody[T](body)
+	request := WrapRequestMockBody[T](
+		body,
+		ctx,
+		&requestHeaders,
+	)
 	response = mc.Handler(
 		request,
 		func(i int) {
