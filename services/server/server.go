@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -21,6 +22,56 @@ import (
 var router *gin.Engine
 var server http.Server
 
+func logErrorRequests() gin.HandlerFunc {
+	logger := logger.WithContext("gin")
+
+	return func(c *gin.Context) {
+		// Start timer
+		start := time.Now()
+		p := c.Request.URL.Path
+		raw := c.Request.URL.RawQuery
+
+		c.Next()
+		statusCode := c.Writer.Status()
+		var loggerFn = logger.Debug
+		var err error
+		var contextError = c.Errors.ByType(gin.ErrorTypePrivate)
+		if statusCode >= 500 {
+			loggerFn = logger.Error
+			err = fmt.Errorf("request returned server error")
+		} else if len(contextError) > 0 {
+			loggerFn = logger.Error
+			err = fmt.Errorf("request returned context error: %s", contextError.String())
+		}
+
+		latency := time.Now().Sub(start)
+		method := c.Request.Method
+		url := p
+		if len(raw) > 0 {
+			url = fmt.Sprintf("%s?%s", p, raw)
+		}
+
+		if err != nil {
+			loggerFn(
+				"%s %s - %d (%dms)",
+				method,
+				url,
+				statusCode,
+				int64(latency.Seconds()),
+				bugsnag.FromError("Request Error", err),
+			)
+		} else {
+			loggerFn(
+				"%s %s - %d (%dms)",
+				method,
+				url,
+				statusCode,
+				int64(latency.Seconds()),
+			)
+		}
+	}
+}
+
 func init() {
 	logger := logger.WithContext("server")
 	config := config.QuietBuild(ServerConfig{})
@@ -28,7 +79,7 @@ func init() {
 	router = gin.New()
 
 	router.Use(
-		gin.LoggerWithWriter(gin.DefaultWriter, "/api/health", "/"),
+		logErrorRequests(),
 		gin.Recovery(),
 	)
 
