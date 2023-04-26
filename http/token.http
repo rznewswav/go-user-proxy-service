@@ -1,13 +1,13 @@
 GET /api/v1/me HTTP/1.1
 host: {{host}}
-nwtoken: {{$dotenv NW_TOKEN}}
+nwtoken: {{NW_TOKEN}}
 
 
 ###
 
 POST /api/v1/me HTTP/1.1
 host: {{host}}
-nwtoken: {{$dotenv NW_TOKEN}}
+nwtoken: {{NW_TOKEN}}
 Content-Type: application/json
 
 {"hello":"world"}
