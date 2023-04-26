@@ -17,3 +17,4 @@ vendor/
 .DS_Store
 resources/templates-history
 __debug_bin
+/out/go_build_main_go
