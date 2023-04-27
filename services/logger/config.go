@@ -10,15 +10,15 @@ import (
 )
 
 var nilLogger = log.New(io.Discard, "nil", 0)
-var globalDebugLogger *log.Logger = nilLogger
-var globalInfoLogger *log.Logger = nilLogger
-var globalWarnLogger *log.Logger = nilLogger
-var globalErrorLogger *log.Logger = nilLogger
+var globalDebugLogger = nilLogger
+var globalInfoLogger = nilLogger
+var globalWarnLogger = nilLogger
+var globalErrorLogger = nilLogger
 var debugOut = io.Discard
 var infoOut = io.Discard
 var warnOut = io.Discard
 var errorOut = io.Discard
-var TraceLogDepth int = 1
+var TraceLogDepth = 1
 
 const standardFlags = log.LstdFlags
 const noFlag = 0

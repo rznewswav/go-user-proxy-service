@@ -22,13 +22,13 @@ func AddKeyPrefix(key string) string {
 	return fmt.Sprintf("user-proxy:%s", key)
 }
 
-func Connect(shutdownHandler *shutdown.ShutdownHandler) {
+func Connect(shutdownHandler *shutdown.Handler) {
 	if Client != nil {
 		return
 	}
-	logger := logger.WithContext("redis")
+	l := logger.For("redis")
 
-	redisConfig := config.QuietBuild(RedisConfig{})
+	redisConfig := config.QuietBuild(Config{})
 
 	Client = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisConfig.RedisHost, redisConfig.RedisPort),
@@ -50,14 +50,14 @@ func Connect(shutdownHandler *shutdown.ShutdownHandler) {
 		defer pingCtxCancel()
 
 		if pingError := Client.Ping(pingCtx).Err(); pingError != nil {
-			logger.Error("redis ping returned error: %s", pingError)
+			l.Error("redis ping returned error: %s", pingError)
 			return
 		}
 
 		execCtx, execCtxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer execCtxCancel()
 		if execError := Client.Get(execCtx, "random:key").Err(); execError != nil && execError != redis.Nil {
-			logger.Error("redis get test returned error: %s", execError)
+			l.Error("redis get test returned error: %s", execError)
 			initExecError = execError
 			return
 		}
@@ -85,20 +85,20 @@ func Health() error {
 }
 
 func Disconnect() error {
-	logger := logger.WithContext("redis")
+	l := logger.For("redis")
 	if initisLocked {
-		logger.Warn("redis is still trying to connect but a disconection was requested!")
+		l.Warn("redis is still trying to connect but a disconection was requested!")
 	}
 
 	initLock.Lock()
-	logger.Debug("redis client lock requested and acquired, redis client is safe to be closed")
+	l.Debug("redis client lock requested and acquired, redis client is safe to be closed")
 	initLock.Unlock()
 	defer func() {
 		if onFinishedShutdown != nil {
-			logger.Debug("emitting shutdown finished hook")
+			l.Debug("emitting shutdown finished hook")
 			onFinishedShutdown()
 		} else {
-			logger.Debug("shutdown finished hook is not assigned")
+			l.Debug("shutdown finished hook is not assigned")
 		}
 	}()
 
@@ -116,9 +116,9 @@ func Disconnect() error {
 }
 
 func QuietDisconnect() {
-	logger := logger.WithContext("redis")
+	l := logger.For("redis")
 	disconnectError := Disconnect()
 	if disconnectError != nil {
-		logger.Error("error at disconnecting redis: %s", disconnectError.Error())
+		l.Error("error at disconnecting redis: %s", disconnectError.Error())
 	}
 }

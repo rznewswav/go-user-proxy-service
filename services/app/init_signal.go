@@ -9,22 +9,22 @@ import (
 )
 
 func InitSignal(
-	shutdownHandler *shutdown.ShutdownHandler,
+	shutdownHandler *shutdown.Handler,
 ) func() {
-	logger := logger.WithContext("signal")
+	l := logger.For("signal")
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		signal := <-sigchan
+		s := <-sigchan
 		println("")
-		logger.Debug(
-			"Caught signal %v: terminating",
-			signal,
+		l.Debug(
+			"Caught s %v: terminating",
+			s,
 		)
 		shutdownHandler.StartShutdown()
 	}()
-	logger.Info("initialized signal handler")
+	l.Info("initialized signal handler")
 	return func() {
 		close(sigchan)
 	}

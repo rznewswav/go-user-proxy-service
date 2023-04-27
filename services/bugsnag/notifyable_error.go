@@ -1,50 +1,48 @@
-package bugsnag_structs
+package bugsnag
 
 import (
 	"fmt"
-	bugsnag_interfaces "service/services/bugsnag/interfaces"
-
 	driver "github.com/bugsnag/bugsnag-go/v2"
 )
 
-type NotifyableError struct {
+type NotifiableError struct {
 	Class             string
 	Message           string
 	CausedBy          error
 	RemediationAction string
 	Stacks            []driver.StackFrame
-	ErrorDecorators   []bugsnag_interfaces.BugsnagDecorator
+	ErrorDecorators   []BugsnagDecorator
 }
 
-func (ne *NotifyableError) SetMessage(
+func (ne *NotifiableError) SetMessage(
 	Message string,
-) *NotifyableError {
+) *NotifiableError {
 	ne.Message = Message
 	return ne
 }
 
-func (ne *NotifyableError) AddBugsnagDecorator(
-	Decorator bugsnag_interfaces.BugsnagDecorator,
-) *NotifyableError {
+func (ne *NotifiableError) AddBugsnagDecorator(
+	Decorator BugsnagDecorator,
+) *NotifiableError {
 	ne.ErrorDecorators = append(ne.ErrorDecorators, Decorator)
 	return ne
 }
 
-func (ne *NotifyableError) SetCausedBy(
+func (ne *NotifiableError) SetCausedBy(
 	CausedBy error,
-) *NotifyableError {
+) *NotifiableError {
 	ne.CausedBy = CausedBy
 	return ne
 }
 
-func (ne *NotifyableError) SetRemediationAction(
+func (ne *NotifiableError) SetRemediationAction(
 	action string,
-) *NotifyableError {
+) *NotifiableError {
 	ne.RemediationAction = action
 	return ne
 }
 
-func (ne *NotifyableError) Error() string {
+func (ne *NotifiableError) Error() string {
 	if ne.CausedBy != nil {
 		return fmt.Errorf("%s: %w", ne.Message, ne.CausedBy).
 			Error()

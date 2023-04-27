@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	logger_structs "service/services/logger/structs"
-	stack "service/services/stack"
+	"strings"
 )
 
 type PrettyTransformers struct{}
@@ -24,16 +24,11 @@ func (transformer *PrettyTransformers) Transform(
 	level := obj.Level
 
 	if len(obj.Stack) > 0 {
-		stackObject := obj.Stack[0]
-		fileName = fmt.Sprintf(
-			"%s:%d",
-			stackObject.File,
-			stackObject.LineNumber,
-		)
+		fileName = obj.Stack[0]
 	}
 
 	if len(obj.Stack) > 1 {
-		verboseStack = stack.SimpleString(obj.Stack)
+		verboseStack = strings.Join(obj.Stack, "\n")
 	}
 
 	if obj.Message != nil {

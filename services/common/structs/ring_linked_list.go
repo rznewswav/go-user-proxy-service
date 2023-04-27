@@ -29,9 +29,9 @@ func (rll *RingLinkedList) Init(size int) {
 	rll.Head = current
 	iterate := 1
 	for iterate < size {
-		new := new(RingLinkedListItem)
-		current.next = new
-		current = new
+		newRingList := new(RingLinkedListItem)
+		current.next = newRingList
+		current = newRingList
 		iterate += 1
 	}
 	current.next = head

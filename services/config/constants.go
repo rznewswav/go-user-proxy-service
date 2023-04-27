@@ -2,7 +2,7 @@ package config
 
 import "errors"
 
-var ErrReflectFieldNotSetable = errors.New(
+var ErrReflectFieldNotSettable = errors.New(
 	"reflect field is not settable",
 )
 

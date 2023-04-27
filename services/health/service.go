@@ -51,7 +51,7 @@ func WrapHealthFuncWithTimeouts(f func() error) func() error {
 }
 
 func NewPatient(name string, fn func() error) {
-	logger := logger.WithContext("health")
+	l := logger.For("health")
 	patient := Patient{name, WrapHealthFuncWithTimeouts(fn)}
 	Patients = append(Patients, patient)
 	if _, registeredHealthStatus := SystemHealth.Patients[name]; !registeredHealthStatus {
@@ -61,7 +61,7 @@ func NewPatient(name string, fn func() error) {
 		}
 		SystemHealth.Patients[name] = patientHealthStatus
 	} else {
-		logger.Info("previous patient with the name %s is already registered! overwriting existing record...", name)
+		l.Info("previous patient with the name %s is already registered! overwriting existing record...", name)
 	}
 }
 

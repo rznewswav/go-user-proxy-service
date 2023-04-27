@@ -84,3 +84,11 @@ func SimpleString(stack []bugsnag.StackFrame) string {
 
 	return stackString
 }
+
+func ToStackString(stack []bugsnag.StackFrame) (strArr []string) {
+	strArr = make([]string, len(stack))
+	for index, trace := range stack {
+		strArr[index] = fmt.Sprintf("%s:%d", trace.File, trace.LineNumber)
+	}
+	return
+}

@@ -24,6 +24,7 @@ type Request[Body any] struct {
 
 func WrapRequest[T any](ctx *gin.Context) Request[T] {
 	var bindable T
+	//goland:noinspection GoDeprecation
 	request := Request[T]{
 		Body: func() T {
 			return bindable
@@ -74,6 +75,7 @@ func WrapRequestMockBody[T any](
 	ctx map[string]interface{},
 	requestHeaders *Headers,
 ) Request[T] {
+	//goland:noinspection GoDeprecation
 	request := Request[T]{
 		Body: func() T {
 			return mockBody

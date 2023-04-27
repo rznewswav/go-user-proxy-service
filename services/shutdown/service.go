@@ -9,7 +9,7 @@ import (
 	eventemitter "github.com/vansante/go-event-emitter"
 )
 
-type ShutdownHandler struct {
+type Handler struct {
 	count            int
 	channel          chan int
 	shutdownFinished map[int]bool
@@ -18,13 +18,13 @@ type ShutdownHandler struct {
 	writeLock        sync.RWMutex
 }
 
-func NewHandler() *ShutdownHandler {
+func NewHandler() *Handler {
 	channel := make(chan int)
 	shutdownFinishedMap := make(map[int]bool)
 	nameMap := make(map[int]*string)
 	eventEmitter := eventemitter.NewEmitter(true)
 
-	handler := ShutdownHandler{
+	handler := Handler{
 		count:            0,
 		channel:          channel,
 		shutdownFinished: shutdownFinishedMap,
@@ -37,14 +37,12 @@ func NewHandler() *ShutdownHandler {
 
 var unnamedHook = "<unnamed>"
 
-/*
-Returns a function after the shutdown has finished
-*/
-func (handler *ShutdownHandler) NewShutdownHook(
+// NewShutdownHook Returns a function after the shutdown has finished
+func (handler *Handler) NewShutdownHook(
 	name string,
 	onShutdown func(),
 ) func() {
-	logger := logger.WithContext("shutdown")
+	l := logger.For("shutdown")
 
 	// eliminate this error: concurrent map writes https://app.bugsnag.com/newswav/service-worker/errors/63e5798763b1730008822c00?filters[event.since]=30d&filters[error.status]=open&filters[app.release_stage]=production
 	// using this solution: https://stackoverflow.com/questions/45585589/golang-fatal-error-concurrent-map-read-and-map-write
@@ -61,7 +59,7 @@ func (handler *ShutdownHandler) NewShutdownHook(
 	handler.eventEmitter.AddListener(
 		"shutdown",
 		func(arguments ...interface{}) {
-			logger.Debug(
+			l.Debug(
 				"onShutdown: %s",
 				name,
 			)
@@ -69,7 +67,7 @@ func (handler *ShutdownHandler) NewShutdownHook(
 		},
 	)
 
-	logger.Debug(
+	l.Debug(
 		"Added shutdown hook for event name: %s",
 		name,
 	)
@@ -79,7 +77,7 @@ func (handler *ShutdownHandler) NewShutdownHook(
 	}
 }
 
-func (handler *ShutdownHandler) IsAllShutdownHookCalled() bool {
+func (handler *Handler) IsAllShutdownHookCalled() bool {
 	someHasNotFinished := false
 	for k := range handler.shutdownFinished {
 		someHasNotFinished = someHasNotFinished ||
@@ -88,14 +86,14 @@ func (handler *ShutdownHandler) IsAllShutdownHookCalled() bool {
 	return !someHasNotFinished
 }
 
-func (handler *ShutdownHandler) Start(
+func (handler *Handler) Start(
 	onFinishedShutdown func(),
 ) {
-	logger := logger.WithContext("shutdown")
+	l := logger.For("shutdown")
 	for {
 		if handler.IsAllShutdownHookCalled() {
 			close(handler.channel)
-			logger.Info("shutting down...")
+			l.Info("shutting down...")
 			onFinishedShutdown()
 			return
 		}
@@ -105,7 +103,7 @@ func (handler *ShutdownHandler) Start(
 			if name == nil {
 				name = &unnamedHook
 			}
-			logger.Warn(
+			l.Warn(
 				"Shutdown hook for %s was called more than once!",
 				*name,
 			)
@@ -115,24 +113,24 @@ func (handler *ShutdownHandler) Start(
 	}
 }
 
-func (handler *ShutdownHandler) RequestShutdown(
+func (handler *Handler) RequestShutdown(
 	reason string,
 	isExpected ...bool,
 ) {
-	logger := logger.WithContext("shutdown")
+	l := logger.For("shutdown")
 	if len(isExpected) > 0 && isExpected[0] {
-		logger.Info(
+		l.Info(
 			"Silent shutdown was requested with reason: %s",
 			reason,
 		)
 	} else {
-		logger.Error(
+		l.Error(
 			"Shutdown was requested with reason: %s",
 			reason,
 		)
 	}
 	if p, err := os.FindProcess(syscall.Getpid()); err != nil {
-		logger.Error(
+		l.Error(
 			"Shutdown was requested but current process id cannot be queried with reason: %s",
 			err.Error(),
 		)
@@ -141,6 +139,6 @@ func (handler *ShutdownHandler) RequestShutdown(
 	}
 }
 
-func (handler *ShutdownHandler) StartShutdown() {
+func (handler *Handler) StartShutdown() {
 	handler.eventEmitter.EmitEvent("shutdown")
 }

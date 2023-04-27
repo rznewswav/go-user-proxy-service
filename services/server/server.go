@@ -23,7 +23,7 @@ var router *gin.Engine
 var server http.Server
 
 func logErrorRequests() gin.HandlerFunc {
-	logger := logger.WithContext("gin")
+	l := logger.For("gin")
 
 	return func(c *gin.Context) {
 		// Start timer
@@ -33,14 +33,14 @@ func logErrorRequests() gin.HandlerFunc {
 
 		c.Next()
 		statusCode := c.Writer.Status()
-		var loggerFn = logger.Debug
+		var loggerFn = l.Debug
 		var err error
 		var contextError = c.Errors.ByType(gin.ErrorTypePrivate)
 		if statusCode >= 500 {
-			loggerFn = logger.Error
+			loggerFn = l.Error
 			err = errors.New("request returned server error")
 		} else if len(contextError) > 0 {
-			loggerFn = logger.Error
+			loggerFn = l.Error
 			err = errors.Errorf("request returned context error: %s", contextError.String())
 		}
 
@@ -73,8 +73,8 @@ func logErrorRequests() gin.HandlerFunc {
 }
 
 func init() {
-	logger := logger.WithContext("server")
-	config := config.QuietBuild(ServerConfig{})
+	l := logger.For("server")
+	c := config.QuietBuild(Config{})
 	gin.SetMode(gin.ReleaseMode)
 	router = gin.New()
 
@@ -85,14 +85,14 @@ func init() {
 		controllers.AssignRequestLanguage.AsGinMiddleware(),
 	)
 
-	if config.AppEnv != "staging" && config.AppEnv != "production" {
+	if c.AppEnv != "staging" && c.AppEnv != "production" {
 		router.Use(cors.Default())
 		cwd, _ := os.Getwd()
 		router.Static("resources/html", path.Join(cwd, "resources/html"))
-		logger.Info("Development mode activated, registering development routes...")
+		l.Info("Development mode activated, registering development routes...")
 	} else {
 		corsConfig := cors.Config{}
-		allowOrigins := strings.Split(config.AllowOrigins, ",")
+		allowOrigins := strings.Split(c.AllowOrigins, ",")
 		allowOriginSet := make(map[string]bool)
 		for _, v := range allowOrigins {
 			allowOriginSet[v] = true
@@ -101,7 +101,7 @@ func init() {
 			_, originWhitelisted := allowOriginSet[origin]
 			return originWhitelisted
 		}
-		logger.Info("Production mode activated, only allowing origins: %s", config.AllowOrigins)
+		l.Info("Production mode activated, only allowing origins: %s", c.AllowOrigins)
 		router.Use(cors.New(corsConfig))
 	}
 
@@ -109,13 +109,13 @@ func init() {
 	registerRoutes()
 
 	server = http.Server{
-		Addr:    ":" + config.AppPort,
+		Addr:    ":" + c.AppPort,
 		Handler: router,
 	}
 }
 
 func registerController[T any](controller controllers.Controller[T]) {
-	l := logger.WithContext("server")
+	l := logger.For("server")
 	var handlers []gin.HandlerFunc
 	for _, middleware := range controller.Middlewares {
 		handlers = append(handlers, middleware.AsGinMiddleware())
@@ -139,26 +139,26 @@ func registerController[T any](controller controllers.Controller[T]) {
 
 var onFinishedShutdown func() = nil
 
-func Start(shutdownHandler *shutdown.ShutdownHandler) {
-	logger := logger.WithContext("server")
+func Start(shutdownHandler *shutdown.Handler) {
+	l := logger.For("server")
 
 	onFinishedShutdown = shutdownHandler.NewShutdownHook("server", Stop)
 	go func() {
-		logger.Info("starting server at address %s", server.Addr)
+		l.Info("starting server at address %s", server.Addr)
 		if startServerError := server.ListenAndServe(); startServerError != nil && startServerError != http.ErrServerClosed {
-			logger.Error("failed to start server", bugsnag.FromError("Start Server Error", startServerError))
+			l.Error("failed to start server", bugsnag.FromError("Start Server Error", startServerError))
 		}
 	}()
 }
 
 func Stop() {
-	logger := logger.WithContext("server")
+	l := logger.For("server")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if shutdownError := server.Shutdown(ctx); shutdownError != nil {
-		logger.Warn("shutdown error, ignoring: %s", shutdownError.Error())
+		l.Warn("shutdown error, ignoring: %s", shutdownError.Error())
 	} else {
-		logger.Info("shutdown finished")
+		l.Info("shutdown finished")
 	}
 
 	if onFinishedShutdown != nil {

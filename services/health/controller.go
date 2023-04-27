@@ -7,7 +7,7 @@ import (
 
 var wasLastHealthy = false
 
-var HealthController = controllers.C[any]().
+var GetHealthController = controllers.C[any]().
 	Get("/api/health").
 	Handle(func(
 		body controllers.Request[any],
@@ -27,8 +27,8 @@ var HealthController = controllers.C[any]().
 		return isHealthy
 	})
 
-// HealthMiddleware Use for endpoints that require other services to be ready before handling requests
-var HealthMiddleware controllers.Handler[any] = func(
+// GetHealthMiddleware Use for endpoints that require other services to be ready before handling requests
+var GetHealthMiddleware controllers.Handler[any] = func(
 	body controllers.Request[any],
 	SetStatus controllers.SetStatus,
 	SetHeader controllers.SetHeader,

@@ -1,4 +1,4 @@
-package bugsnag_structs
+package bugsnag
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package bugsnag_interfaces
+package bugsnag
 
 import driver "github.com/bugsnag/bugsnag-go/v2"
 

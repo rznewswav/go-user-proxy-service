@@ -22,13 +22,13 @@ var initExecError error
 var initLock sync.Mutex
 var initisLocked = false
 
-func Connect(shutdownHandler *shutdown.ShutdownHandler) {
+func Connect(shutdownHandler *shutdown.Handler) {
 	if initialized {
 		return
 	}
-	logger := logger.WithContext("mysql")
+	l := logger.For("mysql")
 	initialized = true
-	dbConfig := config.QuietBuild(MysqlConfig{})
+	dbConfig := config.QuietBuild(Config{})
 	onFinishedShutdown = shutdownHandler.NewShutdownHook("mysql", QuietDisconnect)
 	initLock.Lock()
 	initisLocked = true
@@ -37,10 +37,10 @@ func Connect(shutdownHandler *shutdown.ShutdownHandler) {
 			initLock.Unlock()
 			initisLocked = false
 		}()
-		logger.Info("entering goroutine...")
+		l.Info("entering goroutine...")
 		if dbClient,
 			dbConnectionError := sql.Open("mysql", dbConfig.DatabaseURL); dbConnectionError != nil {
-			logger.Error("mysql init returned error: %s", dbConnectionError)
+			l.Error("mysql init returned error: %s", dbConnectionError)
 			initDbError = dbConnectionError
 			return
 		} else {
@@ -51,14 +51,14 @@ func Connect(shutdownHandler *shutdown.ShutdownHandler) {
 		defer pingCtxCancel()
 
 		if pingError := Client.PingContext(pingCtx); pingError != nil {
-			logger.Error("mysql ping returned error: %s", pingError)
+			l.Error("mysql ping returned error: %s", pingError)
 			return
 		}
 
 		execCtx, execCtxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer execCtxCancel()
 		if _, execError := Client.ExecContext(execCtx, "SELECT id FROM corona_malaysia_weekly_state_stats LIMIT 1"); execError != nil {
-			logger.Error("mysql exec test returned error: %s", execError)
+			l.Error("mysql exec test returned error: %s", execError)
 			initExecError = execError
 			return
 		}
@@ -96,20 +96,20 @@ func Health() error {
 }
 
 func Disconnect() error {
-	logger := logger.WithContext("mysql")
+	l := logger.For("mysql")
 	if initisLocked {
-		logger.Warn("db is still trying to connect but a disconection was requested!")
+		l.Warn("db is still trying to connect but a disconection was requested!")
 	}
 
 	initLock.Lock()
-	logger.Debug("db client lock requested and acquired, db client is safe to be closed")
+	l.Debug("db client lock requested and acquired, db client is safe to be closed")
 	initLock.Unlock()
 	defer func() {
 		if onFinishedShutdown != nil {
-			logger.Debug("emitting shutdown finished hook")
+			l.Debug("emitting shutdown finished hook")
 			onFinishedShutdown()
 		} else {
-			logger.Debug("shutdown finished hook is not assigned")
+			l.Debug("shutdown finished hook is not assigned")
 		}
 	}()
 
@@ -127,9 +127,9 @@ func Disconnect() error {
 }
 
 func QuietDisconnect() {
-	logger := logger.WithContext("mysql")
+	l := logger.For("mysql")
 	disconnectError := Disconnect()
 	if disconnectError != nil {
-		logger.Error("error at disconnecting mysql: %s", disconnectError.Error())
+		l.Error("error at disconnecting mysql: %s", disconnectError.Error())
 	}
 }

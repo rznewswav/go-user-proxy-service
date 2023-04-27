@@ -12,6 +12,6 @@ var GetProfileInfo = controllers.C[any]().
 		SetStatus controllers.SetStatus,
 		SetHeader controllers.SetHeader,
 	) (Response any) {
-		profile, _ := body.Context().Get(UserProfileToken)
+		profile, _ := body.Get(UserProfileToken)
 		return profile
 	})

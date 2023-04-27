@@ -34,7 +34,7 @@ var GetUserProfile = func(nwToken string) (
 	success bool,
 	profile AppUserType,
 ) {
-	logger := logger.WithContext("users")
+	logger := logger.For("users")
 	request, requestInitError := http.NewRequest(
 		"GET",
 		nwApiGetUserInfoEndpoint,

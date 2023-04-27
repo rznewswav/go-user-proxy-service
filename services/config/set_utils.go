@@ -47,7 +47,7 @@ func SetReflectValue(
 	strValue string,
 ) error {
 	if !reflectValue.CanSet() {
-		return ErrReflectFieldNotSetable
+		return ErrReflectFieldNotSettable
 	}
 	reflectValueKind := reflectValue.Kind()
 	switch reflectValueKind {

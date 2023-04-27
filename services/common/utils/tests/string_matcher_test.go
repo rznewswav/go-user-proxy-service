@@ -20,6 +20,7 @@ func TestStringMatcherEn(t *testing.T) {
 
 	assert.True(t, matcher.HasInDocument("hello"))
 	assert.True(t, matcher.HasInDocument("world"))
+	//goland:noinspection SpellCheckingInspection
 	assert.False(t, matcher.HasInDocument("llow"))
 	assert.False(t, matcher.HasInDocument("malaysia"))
 }

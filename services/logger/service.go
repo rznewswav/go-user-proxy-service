@@ -10,12 +10,14 @@ import (
 	bnDriver "github.com/bugsnag/bugsnag-go/v2"
 )
 
-type loggerWContext logger_structs.LoggerWithContext
+type WithContext struct {
+	Context string
+}
 
 var logEvents = make(map[string]bool)
 
 func LogEvents(contexts []string) {
-	logger := WithContext("logger")
+	logger := For("logger")
 	logger.Info(
 		"Logging debug events from: %s",
 		contexts,
@@ -25,39 +27,71 @@ func LogEvents(contexts []string) {
 	}
 }
 
-func WithContext(context string) *loggerWContext {
-	logger := loggerWContext{
+func For(context string) *WithContext {
+	logger := WithContext{
 		Context: context,
 	}
 
 	return &logger
 }
 
-/*
-Logs DEBUG to console
+func getLogObject(message string, formatOrPayload []any, level string, context string) logger_structs.LogObject {
+	format, payload := SplitPayloadIntoFormatterAndNotifyableError(
+		formatOrPayload,
+	)
+	formattedMessage := fmt.Sprintf(message, format...)
+	if payload != nil && len(payload.Message) == 0 {
+		payload.Message = formattedMessage
+	}
 
-Usage: Pass string formatting in the payload. eg.
+	var stackTrace []bnDriver.StackFrame
+	if payload != nil && len(payload.Stacks) > 0 {
+		stackTrace = payload.Stacks
+	} else {
+		stackTrace = stack.GetStackTrace()
+	}
 
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName
+	offset := 3
+	stackTrace = utils.ArraySlice(
+		stackTrace,
+		offset,
+		offset+TraceLogDepth,
 	)
 
-Passing bugsnag.NotifyableError at the last parameter will
-result in logging it as YAML object
+	logObject := logger_structs.LogObject{
+		Level:   level,
+		Context: context,
+		Message: &formattedMessage,
+		Stack:   stack.ToStackString(stackTrace),
+		Payload: payload,
+	}
+	return logObject
+}
 
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName,
-		bugsnag.NotifyableError{ Error: "Test" }
-	)
-
-Output:
-
-	Initialized service: <service name>
-	- error: Test
-*/
-func (logger *loggerWContext) Debug(
+// Debug Logs DEBUG to console
+//
+// Usage: Pass string formatting in the payload.
+// E.g.
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName
+//	)
+//
+// Passing bugsnag.NotifyableError at the last parameter will
+// result in logging it as YAML object
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName,
+//		bugsnag.NotifyableError{ Error: "Test" }
+//	)
+//
+// Output:
+//
+//	Initialized service: <service name>
+//	- error: Test
+func (logger *WithContext) Debug(
 	message string,
 	formatOrPayload ...any,
 ) {
@@ -68,218 +102,107 @@ func (logger *loggerWContext) Debug(
 		useLogger = globalInfoLogger
 	}
 
-	format, payload := SplitPayloadIntoFormatterAndNotifyableError(
-		formatOrPayload,
-	)
-	formattedMessage := fmt.Sprintf(message, format...)
-	if payload != nil && len(payload.Message) == 0 {
-		payload.Message = formattedMessage
-	}
-
-	var stackTrace []bnDriver.StackFrame
-	if payload != nil && len(payload.Stacks) > 0 {
-		stackTrace = payload.Stacks
-	} else {
-		stackTrace = stack.GetStackTrace()
-	}
-
-	logObject := logger_structs.LogObject{
-		Level:   level,
-		Context: logger.Context,
-		Message: &formattedMessage,
-		Stack: utils.ArraySlice(
-			stackTrace,
-			2,
-			2+TraceLogDepth,
-		),
-		Payload: payload,
-	}
-
+	logObject := getLogObject(message, formatOrPayload, level, logger.Context)
 	logString := transformer.Transform(logObject)
 	useLogger.Print(logString)
 }
 
-/*
-Logs INFO to console
-
-Usage: Pass string formatting in the payload. eg.
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName
-	)
-
-Passing bugsnag.NotifyableError at the last parameter will
-result in logging it as YAML object
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName,
-		bugsnag.NotifyableError{ Error: "Test" }
-	)
-
-Output:
-
-	Initialized service: <service name>
-	- error: Test
-*/
-func (logger *loggerWContext) Info(
+// Info Logs INFO to console
+//
+// Usage: Pass string formatting in the payload.
+// E.g.
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName
+//	)
+//
+// Passing bugsnag.NotifyableError at the last parameter will
+// result in logging it as YAML object
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName,
+//		bugsnag.NotifyableError{ Error: "Test" }
+//	)
+//
+// Output:
+//
+//	Initialized service: <service name>
+//	- error: Test
+func (logger *WithContext) Info(
 	message string,
 	formatOrPayload ...any,
 ) {
-	format, payload := SplitPayloadIntoFormatterAndNotifyableError(
-		formatOrPayload,
-	)
-	formattedMessage := fmt.Sprintf(message, format...)
-	if payload != nil && len(payload.Message) == 0 {
-		payload.Message = formattedMessage
-	}
-
-	var stackTrace []bnDriver.StackFrame
-	if payload != nil && len(payload.Stacks) > 0 {
-		stackTrace = payload.Stacks
-	} else {
-		stackTrace = stack.GetStackTrace()
-	}
-
-	logObject := logger_structs.LogObject{
-		Level:   transformer.Info(),
-		Context: logger.Context,
-		Message: &formattedMessage,
-		Stack: utils.ArraySlice(
-			stackTrace,
-			2,
-			2+TraceLogDepth,
-		),
-		Payload: payload,
-	}
+	logObject := getLogObject(message, formatOrPayload, transformer.Info(), logger.Context)
 
 	logString := transformer.Transform(logObject)
 	globalInfoLogger.Print(logString)
 }
 
-/*
-Logs WARN to console
-
-Usage: Pass string formatting in the payload. eg.
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName
-	)
-
-Passing bugsnag.NotifyableError at the last parameter will
-result in logging it as YAML object
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName,
-		bugsnag.NotifyableError{ Error: "Test" }
-	)
-
-Output:
-
-	Initialized service: <service name>
-	- error: Test
-*/
-func (logger *loggerWContext) Warn(
+// Warn Logs WARN to console
+//
+// Usage: Pass string formatting in the payload.
+// E.g.
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName
+//	)
+//
+// Passing bugsnag.NotifyableError at the last parameter will
+// result in logging it as YAML object
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName,
+//		bugsnag.NotifyableError{ Error: "Test" }
+//	)
+//
+// Output:
+//
+//	Initialized service: <service name>
+//	- error: Test
+func (logger *WithContext) Warn(
 	message string,
 	formatOrPayload ...any,
 ) {
-	format, payload := SplitPayloadIntoFormatterAndNotifyableError(
-		formatOrPayload,
-	)
-	formattedMessage := fmt.Sprintf(message, format...)
-	if payload != nil && len(payload.Message) == 0 {
-		payload.Message = formattedMessage
-	}
-
-	var stackTrace []bnDriver.StackFrame
-	if payload != nil && len(payload.Stacks) > 0 {
-		stackTrace = payload.Stacks
-	} else {
-		stackTrace = stack.GetStackTrace()
-	}
-
-	logObject := logger_structs.LogObject{
-		Level:   transformer.Warn(),
-		Context: logger.Context,
-		Message: &formattedMessage,
-		Stack:   stackTrace,
-		Payload: payload,
-	}
-
+	logObject := getLogObject(message, formatOrPayload, transformer.Warn(), logger.Context)
 	logString := transformer.Transform(logObject)
 	globalWarnLogger.Print(logString)
 }
 
-/*
-Logs ERROR to console
-
-Usage: Pass string formatting in the payload. eg.
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName
-	)
-
-Passing bugsnag.NotifyableError at the last parameter will
-result in logging it as YAML object.
-
-	logger.Debug(
-		"Initialized service: %s",
-		serviceName,
-		bugsnag.NotifyableError{ Error: "Test" }
-	)
-
-Output:
-
-	Initialized service: <service name>
-	- error: Test
-
-This object will also be reported to the bugsnag on
-enabled release stages.
-*/
-func (logger *loggerWContext) Error(
+// Error Logs ERROR to console
+//
+// Usage: Pass string formatting in the payload.
+// E.g.
+//
+//	logger.Debug(
+//		"Initialized service: %s",
+//		serviceName
+//	)
+//
+// Passing bugsnag.NotifyableError at the last parameter will
+// result in logging it as YAML object.
+//
+//	Logger.Debug(
+//		"Initialized service: %s",
+//		serviceName,
+//		bugsnag.NotifyableError{ Error: "Test" }
+//	)
+//
+// Output:
+//
+//	Initialized service: <service name>
+//	- error: Test
+//
+// This object will also be reported to the bugsnag on
+// enabled release stages.
+func (logger *WithContext) Error(
 	message string,
 	formatOrPayload ...any,
 ) {
-	format, payload := SplitPayloadIntoFormatterAndNotifyableError(
-		formatOrPayload,
-	)
-	formattedMessage := fmt.Sprintf(message, format...)
-
-	if payload == nil {
-		pl := bugsnag.New("Unknown Error")
-		payload = pl
-	}
-
-	payload.Message = utils.If(
-		len(payload.Message) == 0,
-		formattedMessage,
-		payload.Message,
-	)
-
-	var stackTrace []bnDriver.StackFrame
-
-	if len(payload.Stacks) > 0 {
-		stackTrace = payload.Stacks
-	} else {
-		stackTrace = stack.GetStackTrace()
-	}
-
-	logObject := logger_structs.LogObject{
-		Level:   transformer.Error(),
-		Context: logger.Context,
-		Message: &formattedMessage,
-		Stack: utils.ArraySlice(
-			stackTrace,
-			2,
-			2+TraceLogDepth,
-		),
-		Payload: payload,
-	}
-
+	logObject := getLogObject(message, formatOrPayload, transformer.Info(), logger.Context)
 	logString := transformer.Transform(logObject)
 	globalErrorLogger.Print(logString)
 

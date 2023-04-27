@@ -1,5 +1,5 @@
 package mysql
 
-type MysqlConfig struct {
+type Config struct {
 	DatabaseURL string `env:"MYSQL_URL"`
 }

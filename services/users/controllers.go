@@ -12,7 +12,7 @@ var AuthMiddleware controllers.Handler[any] = func(
 	SetStatus controllers.SetStatus,
 	SetHeader controllers.SetHeader,
 ) (Response any) {
-	nwToken := body.Context().GetHeader("nwtoken")
+	nwToken := body.Header("nwtoken")
 
 	success, profile := GetUserProfile(nwToken)
 	if !success {

@@ -1,7 +1,6 @@
 package bugsnag
 
 import (
-	bugsnag_structs "service/services/bugsnag/structs"
 	"service/services/common/structs"
 	"service/services/stack"
 	"time"
@@ -10,7 +9,7 @@ import (
 var breadcrumbs = new(structs.RingLinkedList)
 
 func LeaveBreadcrumb(data string) {
-	bc := new(bugsnag_structs.Breadcrumb)
+	bc := new(Breadcrumb)
 	bc.Time = time.Now().Format(time.RFC3339)
 	bc.Data = data
 	bc.Stacks = stack.GetStackTrace()[1:]

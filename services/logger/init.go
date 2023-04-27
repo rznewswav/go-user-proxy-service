@@ -1,17 +1,21 @@
 package logger
 
 import (
+	"service/services/bugsnag"
 	"service/services/config"
-	logger_structs "service/services/logger/structs"
+	"strings"
 )
 
 func init() {
-	config := config.QuietBuild(logger_structs.LoggerConfig{})
-	SetLogLevel(config.LogLevel)
-	if config.PrettifyLogger {
+	c := config.QuietBuild(Config{})
+	SetLogLevel(c.LogLevel)
+	if c.PrettifyLogger {
 		UsePrettyTransformer()
 	} else {
 		UseJsonTransformer()
 	}
-	WithContext("logger").Info("Log level is set to: %s", config.LogLevel)
+	logEvents := strings.Split(c.LogEvents, ",")
+	LogEvents(logEvents)
+	For("logger").Info("Log level is set to: %s", c.LogLevel)
+	bugsnag.Start(For("bugsnag").Info)
 }

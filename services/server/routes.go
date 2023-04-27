@@ -6,7 +6,7 @@ import (
 )
 
 func registerRoutes() {
-	registerController(health.HealthController)
+	registerController(health.GetHealthController)
 	registerController(users.GetProfileInfo)
 	registerController(users.ConcatenateProfileInfo)
 	registerController(users.PostProfileWithStruct)

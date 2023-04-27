@@ -1,19 +1,19 @@
 package logger_test
 
 import (
-	bugsnag_structs "service/services/bugsnag/structs"
+	bugsnag_structs "service/services/bugsnag"
 	"service/services/logger"
 	"testing"
 )
 
 func TestSeparateNotifyableErrorArrayLength0(t *testing.T) {
-	get := func(payload ...any) ([]any, *bugsnag_structs.NotifyableError) {
+	get := func(payload ...any) ([]any, *bugsnag_structs.NotifiableError) {
 		return logger.SplitPayloadIntoFormatterAndNotifyableError(
 			payload,
 		)
 	}
 
-	inputNotifyableError := bugsnag_structs.NotifyableError{
+	inputNotifyableError := bugsnag_structs.NotifiableError{
 		Message: "test",
 	}
 
@@ -39,7 +39,7 @@ func TestSeparateNotifyableErrorArrayLength0(t *testing.T) {
 func TestSeparateNotifyableErrorArrayLength0NoError(
 	t *testing.T,
 ) {
-	get := func(payload ...any) ([]any, *bugsnag_structs.NotifyableError) {
+	get := func(payload ...any) ([]any, *bugsnag_structs.NotifiableError) {
 		return logger.SplitPayloadIntoFormatterAndNotifyableError(
 			payload,
 		)
@@ -62,7 +62,7 @@ func TestSeparateNotifyableErrorArrayLength0NoError(
 	}
 }
 func TestSeparateNotifyableErrorArrayLength1(t *testing.T) {
-	get := func(payload ...any) ([]any, *bugsnag_structs.NotifyableError) {
+	get := func(payload ...any) ([]any, *bugsnag_structs.NotifiableError) {
 		return logger.SplitPayloadIntoFormatterAndNotifyableError(
 			payload,
 		)
@@ -86,13 +86,13 @@ func TestSeparateNotifyableErrorArrayLength1(t *testing.T) {
 }
 
 func TestSeparateNotifyableErrorArrayLength2(t *testing.T) {
-	get := func(payload ...any) ([]any, *bugsnag_structs.NotifyableError) {
+	get := func(payload ...any) ([]any, *bugsnag_structs.NotifiableError) {
 		return logger.SplitPayloadIntoFormatterAndNotifyableError(
 			payload,
 		)
 	}
 
-	inputNotifyableError := bugsnag_structs.NotifyableError{
+	inputNotifyableError := bugsnag_structs.NotifiableError{
 		Message: "test",
 	}
 

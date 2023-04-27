@@ -3,70 +3,59 @@ package bugsnag
 import (
 	"errors"
 	"fmt"
-	"log"
-	"os"
 	"service/services/common/utils"
+	"service/services/config"
 	"service/services/stack"
-
-	bugsnag_interfaces "service/services/bugsnag/interfaces"
-	bugsnag_structs "service/services/bugsnag/structs"
 
 	"github.com/bugsnag/bugsnag-go/v2"
 )
 
-func IsDeploymenReleaseStage(stage string) bool {
-	return stage == "staging" || stage == "production"
-}
+var configured = false
+var c = Config{}
 
-func DefaultReleaseStages() func() []string {
-	return func() []string {
-		return []string{"staging", "production"}
+func init() {
+	c := config.QuietBuild(Config{})
+	if c.NoReport {
+		return
 	}
 }
 
-func ExtendReleaseStages(stage string) func() []string {
-	if IsDeploymenReleaseStage(stage) {
-		return DefaultReleaseStages()
-	}
-	return func() []string {
-		return []string{"staging", "production", stage}
-	}
-}
-
-var configured bool = false
-
-/*
-*
-Only release stage 'staging' and 'production' will be enabled.
-However, if `forceReleaseStage` is true, the unrelated release
-stage will be enabled. This is useful to debug error reported
-to bugsnag in development mode.
-*/
+// Start Only release stage 'staging' and 'production' will be enabled.
+//
+// However, if `forceReleaseStage` is true, the unrelated release
+// stage will be enabled.
+//
+// This is useful to debug error reported
+// to bugsnag in development mode.
 func Start(
-	apiKey string,
-	releaseStage string,
-	forceReleaseStage bool,
+	logFn func(string, ...any),
 ) {
+	apiKey := c.BugsnagApiKey
+	releaseStage := c.AppEnv
+	forceReleaseStage := c.Debug
+
+	if c.NoReport {
+		return
+	}
 	// let's just collect the last 8 events
 	breadcrumbs.Init(8)
-	logger := log.New(os.Stdout, "BUGSNAG ", log.LstdFlags)
 	if configured {
-		logger.Printf(
-			"WARN: bugsnag is already initialized for stage: %s\n",
+		logFn(
+			"WARN: bugsnag is already initialized for stage: %s",
 			releaseStage,
 		)
 		return
 	}
 
 	if !forceReleaseStage &&
-		!IsDeploymenReleaseStage(releaseStage) {
-		logger.Printf(
-			"not starting bugsnag for stage: %s\n",
+		!IsDeploymentReleaseStage(releaseStage) {
+		logFn(
+			"not starting bugsnag for stage: %s",
 			releaseStage,
 		)
 		return
 	} else {
-		logger.Printf("initialized bugsnag for stage: %s\n", releaseStage)
+		logFn("initialized bugsnag for stage: %s", releaseStage)
 	}
 
 	bugsnag.Configure(bugsnag.Configuration{
@@ -78,12 +67,11 @@ func Start(
 			DefaultReleaseStages(),
 		),
 		AppType: "worker",
-		// ProjectPackages:     []string{"main", "service/**"},
 	})
 
 	bugsnag.OnBeforeNotify(
 		func(event *bugsnag.Event, config *bugsnag.Configuration) error {
-			var payload *bugsnag_structs.NotifyableError
+			var payload *NotifiableError
 
 			switch {
 			case errors.As(event.Error.Err, &payload):
@@ -114,19 +102,19 @@ func Start(
 	configured = true
 }
 
-func GetHandler() bugsnag_interfaces.IBugsnagHandler {
+func GetHandler() Handler {
 	if configured {
-		return &bugsnag_structs.BugsnagHandler{}
+		return &handler{}
 	}
-	return &bugsnag_structs.DevBugsnagHandler{}
+	return &silentHandler{}
 }
 
 type ErrorClass string
 
 func New(
 	ErrorClass ErrorClass,
-) *bugsnag_structs.NotifyableError {
-	ne := new(bugsnag_structs.NotifyableError)
+) *NotifiableError {
+	ne := new(NotifiableError)
 	ne.Stacks = stack.GetStackTrace()
 
 	ne.Class = string(ErrorClass)
@@ -136,11 +124,11 @@ func New(
 func FromError(
 	ErrorClass string,
 	sourceError error,
-) *bugsnag_structs.NotifyableError {
-	ne := new(bugsnag_structs.NotifyableError)
+) *NotifiableError {
+	ne := new(NotifiableError)
 
 	// inherit from parent
-	if notifiableError, ok := sourceError.(*bugsnag_structs.NotifyableError); ok {
+	if notifiableError, ok := sourceError.(*NotifiableError); ok {
 		ne.Stacks = notifiableError.Stacks
 		ne.ErrorDecorators = notifiableError.ErrorDecorators
 	} else {
