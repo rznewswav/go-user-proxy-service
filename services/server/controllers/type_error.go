@@ -54,7 +54,41 @@ func (t TypeError) Type() reflect.Type {
 }
 
 func (t TypeError) Translate(ut ut.Translator) string {
-	return ""
+	switch t.Type().Kind() {
+	case reflect.Int:
+		fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		fallthrough
+	case reflect.Float32:
+		fallthrough
+	case reflect.Float64:
+		translated, translationError := ut.T("number", t.Field())
+		if translationError != nil {
+			goto END
+		}
+		return translated
+	case reflect.Bool:
+		translated, translationError := ut.T("boolean", t.Field())
+		if translationError != nil {
+			goto END
+		}
+		return translated
+	case reflect.String:
+		translated, translationError := ut.T("string", t.Field())
+		if translationError != nil {
+			goto END
+		}
+		return translated
+	}
+
+END:
+	return fmt.Sprintf("%s must be of type %s", t.Field(), t.Type().Kind())
 }
 
 func (t TypeError) Error() string {
