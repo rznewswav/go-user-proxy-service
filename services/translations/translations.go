@@ -1,6 +1,30 @@
-package controllers
+package t
 
-import ut "github.com/go-playground/universal-translator"
+import (
+	"github.com/go-playground/locales/en"
+	"github.com/go-playground/locales/ms"
+	"github.com/go-playground/locales/zh"
+	ut "github.com/go-playground/universal-translator"
+)
+
+var localeEn = en.New()
+var localeZh = zh.New()
+var localeMs = ms.New()
+var uni = ut.New(localeEn, localeEn, localeZh, localeMs)
+
+func init() {
+	if enTranslator, found := uni.GetTranslator("en"); found {
+		RegisterEnTranslations(enTranslator)
+	}
+
+	if msTranslator, found := uni.GetTranslator("ms"); found {
+		RegisterMsTranslations(msTranslator)
+	}
+
+	if zhTranslator, found := uni.GetTranslator("zh"); found {
+		RegisterZhTranslations(zhTranslator)
+	}
+}
 
 //goland:noinspection GoUnhandledErrorResult
 func RegisterEnTranslations(translator ut.Translator) {
