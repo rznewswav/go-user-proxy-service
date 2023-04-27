@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 )
 
@@ -47,7 +49,18 @@ func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
 	var bindable T
 	bindError := ctx.ShouldBind(&bindable)
 	if bindError != nil {
-		return r, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
+		if _, isValidationError := bindError.(validator.ValidationErrors); isValidationError {
+			return r, bindError
+		} else if jsonTypeError, isJsonFieldTypeError := bindError.(*json.UnmarshalTypeError); isJsonFieldTypeError {
+			singleFieldError := TypeError{
+				FieldName:        jsonTypeError.Field,
+				CurrentValueType: jsonTypeError.Value,
+				TypeOf:           jsonTypeError.Type,
+			}
+			return r, validator.ValidationErrors([]validator.FieldError{singleFieldError})
+		} else {
+			return r, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
+		}
 	}
 	request := WrapRequest[T](ctx)
 	request.Body = func() T {
