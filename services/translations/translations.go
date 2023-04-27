@@ -12,6 +12,11 @@ var localeZh = zh.New()
 var localeMs = ms.New()
 var uni = ut.New(localeEn, localeEn, localeZh, localeMs)
 
+func GetTranslator(locale string) (trans ut.Translator) {
+	trans, _ = uni.GetTranslator(locale)
+	return
+}
+
 func init() {
 	if enTranslator, found := uni.GetTranslator("en"); found {
 		RegisterEnTranslations(enTranslator)

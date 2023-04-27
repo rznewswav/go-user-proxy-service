@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Request A stripped down version of gin.Context.
+// Request A stripped-down version of gin.Context.
 //
 // All response functions are hidden from
 
