@@ -81,6 +81,8 @@ func init() {
 	router.Use(
 		logErrorRequests(),
 		gin.Recovery(),
+		controllers.AssignRequestId.AsGinMiddleware(),
+		controllers.AssignRequestLanguage.AsGinMiddleware(),
 	)
 
 	if config.AppEnv != "staging" && config.AppEnv != "production" {
