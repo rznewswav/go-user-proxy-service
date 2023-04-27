@@ -11,3 +11,13 @@ nwtoken: {{NW_TOKEN}}
 Content-Type: application/json
 
 {"hello":"world"}
+
+###
+
+POST /api/v1/you HTTP/1.1
+host: {{host}}
+nwtoken: {{NW_TOKEN}}
+Content-Type: application/json
+mainlanguage: en
+
+{"age":"24","favouriteColour":"red"}
