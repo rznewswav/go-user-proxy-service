@@ -11,7 +11,7 @@ type NotifiableError struct {
 	CausedBy          error
 	RemediationAction string
 	Stacks            []driver.StackFrame
-	ErrorDecorators   []BugsnagDecorator
+	ErrorDecorators   []Decorator
 }
 
 func (ne *NotifiableError) SetMessage(
@@ -22,7 +22,7 @@ func (ne *NotifiableError) SetMessage(
 }
 
 func (ne *NotifiableError) AddBugsnagDecorator(
-	Decorator BugsnagDecorator,
+	Decorator Decorator,
 ) *NotifiableError {
 	ne.ErrorDecorators = append(ne.ErrorDecorators, Decorator)
 	return ne

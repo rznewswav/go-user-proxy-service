@@ -72,7 +72,7 @@ func (dq *DatabaseQuery) SetDocument(
 
 func (dq *DatabaseQuery) Decorate(
 	event *driver.Event,
-	config *driver.Configuration,
+	_ *driver.Configuration,
 ) {
 	event.MetaData.AddStruct("database", dq)
 }
