@@ -17,7 +17,6 @@ func fileLine(f errors.Frame) string {
 	}
 	file, line := fn.FileLine(uintptr(f) - 1)
 	return fmt.Sprintf("%s:%d", file, line)
-
 }
 
 func main() {
