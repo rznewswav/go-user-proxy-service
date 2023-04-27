@@ -9,4 +9,5 @@ func registerRoutes() {
 	registerController(health.HealthController)
 	registerController(users.GetProfileInfo)
 	registerController(users.ConcatenateProfileInfo)
+	registerController(users.PostProfileWithStruct)
 }
