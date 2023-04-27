@@ -2,9 +2,15 @@ package controllers
 
 import (
 	"errors"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/locales/en"
+	"github.com/go-playground/locales/ms"
+	"github.com/go-playground/locales/zh"
+	ut "github.com/go-playground/universal-translator"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/mariomac/gostream/stream"
+	"net/http"
 )
 
 type SetStatus func(int)
@@ -29,11 +35,65 @@ var RespRequestBodyMalformed = gin.H{
 	},
 }
 
+var localeEn = en.New()
+var localeZh = zh.New()
+var localeMs = ms.New()
+var uni = ut.New(localeEn, localeEn, localeZh, localeMs)
+
+func init() {
+	if enTranslator, found := uni.GetTranslator("en"); found {
+		RegisterEnTranslations(enTranslator)
+	}
+
+	if msTranslator, found := uni.GetTranslator("ms"); found {
+		RegisterMsTranslations(msTranslator)
+	}
+
+	if zhTranslator, found := uni.GetTranslator("zh"); found {
+		RegisterZhTranslations(zhTranslator)
+	}
+}
+
 func (h Handler[T]) AsGinHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		requestObject, wrapError := WrapRequestBindBody[T](ctx)
+		reqLanguageMaybeString, _ := ctx.Get(RequestLanguage)
+		var reqLanguage string
+		if castedToString, castable := reqLanguageMaybeString.(string); castable {
+			reqLanguage = castedToString
+		} else {
+			reqLanguage = "en"
+		}
+
+		translator, _ := uni.GetTranslator(reqLanguage)
+
 		if wrapError != nil {
-			if errors.Is(wrapError, ErrCannotProcessReqBody) {
+			if validationError, isValidationError := wrapError.(validator.ValidationErrors); isValidationError && len(validationError) > 0 {
+				validationErrorStream := stream.OfSlice(validationError)
+				validationErrorStrings := stream.Map(validationErrorStream, func(it validator.FieldError) string {
+					switch it.Tag() {
+					case "required":
+						translated, translationError := translator.T("field-required", it.Field())
+						if translationError != nil {
+							return it.Translate(translator)
+						} else {
+							return translated
+						}
+					default:
+						return it.Translate(translator)
+
+					}
+				}).ToSlice()
+				ctx.JSON(http.StatusBadRequest, gin.H{
+					"status": false,
+					"data": gin.H{
+						"code":         "BAD_REQUEST_BODY",
+						"message":      validationErrorStrings[0],
+						"verboseError": validationErrorStrings,
+					},
+				})
+				return
+			} else if errors.Is(wrapError, ErrCannotProcessReqBody) {
 				ctx.JSON(http.StatusUnprocessableEntity, RespRequestBodyMalformed)
 				return
 			} else {
