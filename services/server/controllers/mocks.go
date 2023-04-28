@@ -8,6 +8,7 @@ import (
 	"service/services/server/handlers"
 	"service/services/server/req"
 	"service/services/server/resp"
+	t "service/services/translations"
 )
 
 type MockController[T any] struct {
@@ -40,6 +41,7 @@ type MockConfig struct {
 
 type MockAddHeader MockConfig
 type MockBody any
+type MockLocale string
 
 func (mc MockController[T]) SendMockRequest(opt ...any) (
 	response gin.H,
@@ -50,6 +52,8 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 
 	var body T
 	var requestHeaders structs.StringDefaultedMap
+	var locale = "en"
+	translator := t.GetTranslator(locale)
 
 	for _, castable := range opt {
 		switch casted := castable.(type) {
@@ -57,6 +61,8 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 			body = casted.(T)
 		case MockAddHeader:
 			requestHeaders.Set(casted.Key, casted.Value)
+		case MockLocale:
+			locale = string(casted)
 		}
 	}
 
@@ -76,7 +82,7 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 		}
 
 		if castedResponse, castable := middleResponse.(resp.Response); castable {
-			payload := castedResponse.GetResponsePayload()
+			payload := castedResponse.GetResponsePayload(translator)
 			payload.Header.ForEach(func(key, value string) {
 				header.Set(key, value)
 			})
@@ -101,7 +107,7 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 	)
 
 	if castedResponse, castable := handlerResponse.(resp.Response); castable {
-		payload := castedResponse.GetResponsePayload()
+		payload := castedResponse.GetResponsePayload(translator)
 		payload.Header.ForEach(func(key, value string) {
 			header.Set(key, value)
 		})

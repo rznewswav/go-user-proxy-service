@@ -17,10 +17,10 @@ var AuthMiddleware handlers.Handler[any] = func(
 
 	success, profile := GetUserProfile(nwToken)
 	if !success {
-		return resp.F().
-			Title(t.NotAuthorizedTitle).
-			Message(t.NotAuthorized).
-			Code("NOT_AUTHORIZED").
+		return resp.F(
+			"NOT_AUTHORIZED",
+			t.NotAuthorizedTitle,
+			t.NotAuthorized).
 			Status(http.StatusForbidden)
 	}
 

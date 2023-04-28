@@ -7,6 +7,7 @@ import (
 	"service/services/server/handlers"
 	"service/services/server/req"
 	"service/services/server/resp"
+	t "service/services/translations"
 )
 
 var wasLastHealthy = false
@@ -23,9 +24,14 @@ var GetHealthController = controllers.C[any]().
 
 		if !isHealthy.Healthy {
 			return resp.
-				F(gin.H{
-					"health": isHealthy,
-				}).
+				F(
+					"SERVICE_UNAVAILABLE",
+					t.GenericErrorTitle,
+					t.GenericErrorMessage,
+					gin.H{
+						"health": isHealthy,
+					},
+				).
 				Status(http.StatusServiceUnavailable)
 		} else {
 			return resp.S(gin.H{
@@ -49,9 +55,14 @@ var GetHealthMiddleware handlers.Handler[any] = func(
 	wasLastHealthy = isHealthy.Healthy
 	if !isHealthy.Healthy {
 		return resp.
-			F(gin.H{
-				"health": isHealthy,
-			}).
+			F(
+				"SERVICE_UNAVAILABLE",
+				t.GenericErrorTitle,
+				t.GenericErrorMessage,
+				gin.H{
+					"health": isHealthy,
+				},
+			).
 			Status(http.StatusServiceUnavailable)
 	}
 
