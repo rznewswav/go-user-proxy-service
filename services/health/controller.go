@@ -34,9 +34,7 @@ var GetHealthController = controllers.C[any]().
 				).
 				Status(http.StatusServiceUnavailable)
 		} else {
-			return resp.S(gin.H{
-				"health": isHealthy,
-			})
+			return resp.S(isHealthy)
 		}
 	})
 
@@ -59,9 +57,7 @@ var GetHealthMiddleware handlers.Handler[any] = func(
 				"SERVICE_UNAVAILABLE",
 				t.GenericErrorTitle,
 				t.GenericErrorMessage,
-				gin.H{
-					"health": isHealthy,
-				},
+				isHealthy,
 			).
 			Status(http.StatusServiceUnavailable)
 	}

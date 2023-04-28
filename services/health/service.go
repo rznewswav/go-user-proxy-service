@@ -13,13 +13,13 @@ type Patient struct {
 }
 
 type PatientHealthStatus struct {
-	Healthy   bool
-	Diagnosis string
+	Healthy   bool   `json:"healthy,omitempty"`
+	Diagnosis string `json:"diagnosis,omitempty"`
 }
 
 type SystemHealthStatus struct {
-	Healthy  bool
-	Patients map[string]PatientHealthStatus
+	Healthy  bool                           `json:"healthy,omitempty"`
+	Patients map[string]PatientHealthStatus `json:"patients,omitempty"`
 }
 
 var Patients []Patient
