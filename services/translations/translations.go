@@ -47,3 +47,25 @@ func RegisterMsTranslations(translator ut.Translator) {
 func RegisterZhTranslations(translator ut.Translator) {
 	//translator.Add("field-required", "{0} is required", true)
 }
+
+//goland:noinspection GoUnhandledErrorResult
+func AddTranslations(key TranslationKey, en, ms, zh string) {
+	if len(ms) == 0 {
+		ms = en
+	}
+
+	if len(zh) == 0 {
+		zh = en
+	}
+	if enTranslator, found := uni.GetTranslator("en"); found {
+		enTranslator.Add(key, en, true)
+	}
+
+	if msTranslator, found := uni.GetTranslator("ms"); found {
+		msTranslator.Add(key, ms, true)
+	}
+
+	if zhTranslator, found := uni.GetTranslator("zh"); found {
+		zhTranslator.Add(key, zh, true)
+	}
+}

@@ -2,22 +2,26 @@ package users
 
 import (
 	"net/http"
-	"service/services/server/controllers"
+	"service/services/server/handlers"
+	"service/services/server/req"
+	"service/services/server/resp"
+	t "service/services/translations"
 )
 
 const UserProfileToken = "user"
 
-var AuthMiddleware controllers.Handler[any] = func(
-	body controllers.Request[any],
-	SetStatus controllers.SetStatus,
-	SetHeader controllers.SetHeader,
-) (Response any) {
+var AuthMiddleware handlers.Handler[any] = func(
+	body req.Request[any],
+) (Response resp.Response) {
 	nwToken := body.Header("nwtoken")
 
 	success, profile := GetUserProfile(nwToken)
 	if !success {
-		SetStatus(http.StatusForbidden)
-		return false
+		return resp.F().
+			Title(t.NotAuthorizedTitle).
+			Message(t.NotAuthorized).
+			Code("NOT_AUTHORIZED").
+			Status(http.StatusForbidden)
 	}
 
 	body.Set(UserProfileToken, profile)

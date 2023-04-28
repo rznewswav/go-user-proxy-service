@@ -2,6 +2,7 @@ package resp
 
 import (
 	"github.com/gin-gonic/gin"
+	"service/services/server/req"
 	"service/services/translations"
 )
 
@@ -10,48 +11,79 @@ type ErrorResponse interface {
 	Code(string) ErrorResponse
 	Title(t.TranslationKey) ErrorResponse
 	Message(t.TranslationKey) ErrorResponse
-	Data() gin.H
 }
-type F struct {
+type f struct {
 	code    string
 	title   t.TranslationKey
 	message t.TranslationKey
-	data    gin.H
+	s
 }
 
-func (s F) Data() gin.H {
-	return s.data
+func (f f) Code(code string) ErrorResponse {
+	f.code = code
+	return f
 }
 
-func (s F) Code(code string) ErrorResponse {
-	s.code = code
-	return s
+func (f f) Title(title t.TranslationKey) ErrorResponse {
+	f.title = title
+	return f
 }
 
-func (s F) Title(title t.TranslationKey) ErrorResponse {
-	s.title = title
-	return s
+func (f f) Message(message t.TranslationKey) ErrorResponse {
+	f.message = message
+	return f
 }
 
-func (s F) Message(message t.TranslationKey) ErrorResponse {
-	s.message = message
-	return s
+func (f f) Success() bool {
+	return false
+}
+
+func (f f) applyTitleMessageTranslation(ctx *gin.Context) {
+	lang := req.GetRequestLanguage(ctx)
+	translator := t.GetTranslator(lang)
+	translatedTitle, translatorTitleError := translator.T(f.title)
+	if translatorTitleError != nil {
+		translatedTitle = string(f.title)
+	}
+
+	translatedMessage, translatorMessageError := translator.T(f.message)
+	if translatorMessageError != nil {
+		translatedMessage = string(f.message)
+	}
+
+	f.data["title"] = translatedTitle
+	data, hasData := f.data["data"]
+	if !hasData {
+		data := make(gin.H)
+		f.data["data"] = data
+	}
+
+	data.(gin.H)["title"] = translatedTitle
+	data.(gin.H)["message"] = translatedMessage
+}
+
+func (f f) Send(ctx *gin.Context) {
+	f.applyTitleMessageTranslation(ctx)
+	f.header.ForEach(func(key, value string) {
+		ctx.Header(key, value)
+	})
+	ctx.AbortWithStatusJSON(f.status, f.data)
 }
 
 func Fail(data gin.H) ErrorResponse {
-	populateMap := make(gin.H)
-	smcopy(data, populateMap)
-	return F{
+	return f{
 		code:    "GENERIC_ERROR",
 		title:   t.GenericErrorTitle,
 		message: t.GenericErrorMessage,
-		data:    data,
+		s:       S(data).(s),
 	}
 }
 
-// smcopy shallow copy map
-func smcopy(data gin.H, populateMap gin.H) {
-	for k, v := range data {
-		populateMap[k] = v
+// F alias for resp.Fail
+func F(data ...gin.H) ErrorResponse {
+	var datum gin.H
+	if len(data) > 0 {
+		datum = data[0]
 	}
+	return Fail(datum)
 }

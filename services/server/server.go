@@ -9,6 +9,7 @@ import (
 	"service/services/config"
 	"service/services/logger"
 	"service/services/server/controllers"
+	"service/services/server/middlewares"
 	"service/services/shutdown"
 	"strings"
 	"time"
@@ -29,8 +30,8 @@ func init() {
 	router.Use(
 		logErrorRequests(),
 		gin.Recovery(),
-		controllers.AssignRequestId.AsGinMiddleware(),
-		controllers.AssignRequestLanguage.AsGinMiddleware(),
+		middlewares.AssignRequestId.AsGinMiddleware(),
+		middlewares.AssignRequestLanguage.AsGinMiddleware(),
 	)
 
 	if c.AppEnv != "staging" && c.AppEnv != "production" {

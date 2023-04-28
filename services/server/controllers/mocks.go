@@ -2,6 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"service/services/common/structs"
+	"service/services/server/handlers"
+	"service/services/server/req"
 )
 
 type MockController[T any] struct {
@@ -16,8 +19,8 @@ func Mock[T any](controller Controller[T]) MockController[T] {
 }
 
 func (mc MockController[T]) ReplaceMiddleware(
-	target *Handler[any],
-	replaceWith *Handler[any],
+	target *handlers.Handler[any],
+	replaceWith *handlers.Handler[any],
 ) MockController[T] {
 	for index, middleware := range mc.Middlewares {
 		if target == middleware {
@@ -38,12 +41,12 @@ type MockBody any
 func (mc MockController[T]) SendMockRequest(opt ...any) (
 	response any,
 	status int,
-	header Headers,
+	header structs.StringDefaultedMap,
 ) {
 	status = http.StatusOK
 
 	var body T
-	var requestHeaders Headers
+	var requestHeaders structs.StringDefaultedMap
 
 	for _, castable := range opt {
 		switch casted := castable.(type) {
@@ -55,7 +58,7 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 	}
 
 	ctx := make(map[string]interface{})
-	requestForMiddie := WrapRequestMockBody[any](
+	requestForMiddie := req.WrapRequestMockBody[any](
 		body,
 		ctx,
 		&requestHeaders,
@@ -63,10 +66,6 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 	for _, middleware := range mc.Middlewares {
 		response = (*middleware)(
 			requestForMiddie,
-			func(i int) {
-				status = i
-			},
-			header.SetterFunc(),
 		)
 
 		if response != nil {
@@ -74,17 +73,13 @@ func (mc MockController[T]) SendMockRequest(opt ...any) (
 		}
 	}
 
-	request := WrapRequestMockBody[T](
+	request := req.WrapRequestMockBody[T](
 		body,
 		ctx,
 		&requestHeaders,
 	)
 	response = mc.Handler(
 		request,
-		func(i int) {
-			status = i
-		},
-		header.SetterFunc(),
 	)
 	return
 }

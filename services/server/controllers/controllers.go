@@ -3,14 +3,15 @@ package controllers
 import (
 	"fmt"
 	"service/services/common/utils"
+	"service/services/server/handlers"
 	"service/services/stack"
 )
 
 type Controller[T any] struct {
 	Route        string
 	Method       Method
-	Middlewares  []*Handler[any]
-	Handler      Handler[T]
+	Middlewares  []*handlers.Handler[any]
+	Handler      handlers.Handler[T]
 	HandlerTrace string
 }
 
@@ -52,17 +53,17 @@ func (c Controller[T]) Delete(Route string) Controller[T] {
 	return c
 }
 
-func (c Controller[T]) UseMiddleware(handler *Handler[any]) Controller[T] {
+func (c Controller[T]) UseMiddleware(handler *handlers.Handler[any]) Controller[T] {
 	c.Middlewares = append(c.Middlewares, handler)
 	return c
 }
 
 func (c Controller[T]) ResetMiddleware() Controller[T] {
-	c.Middlewares = make([]*Handler[any], 0)
+	c.Middlewares = make([]*handlers.Handler[any], 0)
 	return c
 }
 
-func (c Controller[T]) Handle(Handler Handler[T]) Controller[T] {
+func (c Controller[T]) Handle(Handler handlers.Handler[T]) Controller[T] {
 	trace := stack.GetStackTrace()
 	firstOfTrace := utils.ArrayGetOrNil(trace, 2)
 	if firstOfTrace != nil {
@@ -77,7 +78,7 @@ func (c Controller[T]) Handle(Handler Handler[T]) Controller[T] {
 func (c Controller[T]) Clone() (newController Controller[T]) {
 	newController.Route = c.Route
 	newController.Method = c.Method
-	newController.Middlewares = make([]*Handler[any], len(c.Middlewares))
+	newController.Middlewares = make([]*handlers.Handler[any], len(c.Middlewares))
 	copy(newController.Middlewares, c.Middlewares)
 	newController.Handler = c.Handler
 	return

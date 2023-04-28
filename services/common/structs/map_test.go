@@ -1,13 +1,12 @@
-package controllers
+package structs
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestSetHeaders(t *testing.T) {
-	var h Headers
+	var h StringDefaultedMap
 
 	h.Set("hello", "world")
 
@@ -19,7 +18,7 @@ func TestSetHeaders(t *testing.T) {
 }
 
 func TestGetHeaders(t *testing.T) {
-	var h Headers
+	var h StringDefaultedMap
 
 	h.Set("hello", "world")
 
@@ -27,7 +26,7 @@ func TestGetHeaders(t *testing.T) {
 }
 
 func TestGetNilHeaders(t *testing.T) {
-	var h Headers
+	var h StringDefaultedMap
 
 	h.Set("hello", "world")
 

@@ -4,6 +4,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"service/services/server/controllers"
+	"service/services/server/handlers"
+	"service/services/server/req"
+	"service/services/server/resp"
 	"testing"
 )
 
@@ -11,11 +14,9 @@ func TestConcatenateProfileInfo(t *testing.T) {
 	mockController := controllers.Mock[map[string]interface{}](ConcatenateProfileInfo)
 	userProfileValue := "hello"
 
-	var MockUserInfo controllers.Handler[any] = func(
-		Request controllers.Request[any],
-		SetStatus controllers.SetStatus,
-		SetHeader controllers.SetHeader,
-	) (Response any) {
+	var MockUserInfo handlers.Handler[any] = func(
+		Request req.Request[any],
+	) (Response resp.Response) {
 		Request.Set(UserProfileToken, userProfileValue)
 		return nil
 	}

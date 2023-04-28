@@ -1,10 +1,14 @@
-package controllers
+package req
 
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
+	"service/services/common/structs"
+	"service/services/server/constants"
+	errors2 "service/services/server/errors"
+	t "service/services/translations"
 )
 
 // Request A stripped-down version of gin.Context.
@@ -16,10 +20,11 @@ type Request[Body any] struct {
 	// Deprecated: Request.Context is not mockable.
 	// You are encouraged to use the predefined functions
 	// or to extend the Request struct instead.
-	Context func() *gin.Context
-	Get     func(key string) (value any, exists bool)
-	Set     func(key string, value any)
-	Header  func(key string) string
+	Context   func() *gin.Context
+	Get       func(key string) (value any, exists bool)
+	Set       func(key string, value any)
+	Header    func(key string) string
+	Translate func(key t.TranslationKey, params ...string) string
 }
 
 func WrapRequest[T any](ctx *gin.Context) Request[T] {
@@ -42,8 +47,28 @@ func WrapRequest[T any](ctx *gin.Context) Request[T] {
 		Header: func(key string) string {
 			return ctx.GetHeader(key)
 		},
+		Translate: func(key t.TranslationKey, params ...string) string {
+			lang := GetRequestLanguage(ctx)
+			translator := t.GetTranslator(lang)
+			translated, translationError := translator.T(key, params...)
+			if translationError != nil {
+				return string(key)
+			} else {
+				return translated
+			}
+		},
 	}
 	return request
+}
+
+func GetRequestLanguage(ctx *gin.Context) (reqLanguage string) {
+	reqLanguageMaybeString, _ := ctx.Get(constants.RequestLanguage)
+	if castedToString, castable := reqLanguageMaybeString.(string); castable {
+		reqLanguage = castedToString
+	} else {
+		reqLanguage = "en"
+	}
+	return
 }
 
 func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
@@ -53,14 +78,14 @@ func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
 		if _, isValidationError := bindError.(validator.ValidationErrors); isValidationError {
 			return r, bindError
 		} else if jsonTypeError, isJsonFieldTypeError := bindError.(*json.UnmarshalTypeError); isJsonFieldTypeError {
-			singleFieldError := TypeError{
+			singleFieldError := errors2.TypeError{
 				FieldName:        jsonTypeError.Field,
 				CurrentValueType: jsonTypeError.Value,
 				TypeOf:           jsonTypeError.Type,
 			}
 			return r, validator.ValidationErrors([]validator.FieldError{singleFieldError})
 		} else {
-			return r, errors.Wrap(ErrCannotProcessReqBody, bindError.Error())
+			return r, errors.Wrap(errors2.ErrCannotProcessReqBody, bindError.Error())
 		}
 	}
 	request := WrapRequest[T](ctx)
@@ -73,7 +98,7 @@ func WrapRequestBindBody[T any](ctx *gin.Context) (r Request[T], e error) {
 func WrapRequestMockBody[T any](
 	mockBody T,
 	ctx map[string]interface{},
-	requestHeaders *Headers,
+	requestHeaders *structs.StringDefaultedMap,
 ) Request[T] {
 	//goland:noinspection GoDeprecation
 	request := Request[T]{
@@ -92,6 +117,16 @@ func WrapRequestMockBody[T any](
 		},
 		Header: func(key string) string {
 			return requestHeaders.Get(key)
+		},
+		Translate: func(key t.TranslationKey, params ...string) string {
+			lang := ctx[constants.RequestLanguage].(string)
+			translator := t.GetTranslator(lang)
+			translated, translationError := translator.T(key, params...)
+			if translationError != nil {
+				return string(key)
+			} else {
+				return translated
+			}
 		},
 	}
 	return request
