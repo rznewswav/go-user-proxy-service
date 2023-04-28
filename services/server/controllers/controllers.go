@@ -15,10 +15,6 @@ type Controller[T any] struct {
 	HandlerTrace string
 }
 
-func NewController[T any]() Controller[T] {
-	return Controller[T]{}
-}
-
 func Get(Route string) (c Controller[any]) {
 	c.Method = GET
 	c.Route = Route
@@ -31,18 +27,21 @@ func Post[T any](Route string) (c Controller[T]) {
 	return c
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func Put[T any](Route string) (c Controller[T]) {
 	c.Method = PUT
 	c.Route = Route
 	return c
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func Patch[T any](Route string) (c Controller[T]) {
 	c.Method = PATCH
 	c.Route = Route
 	return c
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func Delete[T any](Route string) (c Controller[T]) {
 	c.Method = DELETE
 	c.Route = Route
