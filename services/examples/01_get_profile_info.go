@@ -8,17 +8,19 @@ import (
 	"service/services/server/resp"
 )
 
-var ConcatenateProfileInfo = controllers.
-	Post[map[string]interface{}]("/api/v1/me").
+type GetProfileInfoResponse struct {
+	Profile any `json:"profile,omitempty"`
+}
+
+var GetProfileInfo = controllers.
+	Get("/api/v1/me").
 	UseMiddleware(&middlewares.AuthMiddleware).
 	Handle(func(
-		request req.Request[map[string]interface{}],
+		Request req.Request[any],
 	) (Response resp.Response) {
-		profile, _ := request.Get(constants.UserProfile)
-		return resp.S(
-			map[string]interface{}{
-				"profile": profile,
-				"body":    request.Body(),
-			},
-		)
+		profile, _ := Request.Get(constants.UserProfile)
+
+		return resp.S(GetProfileInfoResponse{
+			profile,
+		})
 	})

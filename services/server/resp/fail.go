@@ -20,7 +20,7 @@ func (r response) Message(message t.TranslationKey) Response {
 }
 
 func Fail(code string, title, message t.TranslationKey, data ...any) Response {
-	r := S(data).(response)
+	r := S(data...).(response)
 	r.success = false
 	r.code = code
 	r.title = title

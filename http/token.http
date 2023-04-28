@@ -1,6 +1,15 @@
 GET /api/v1/me HTTP/1.1
 host: {{host}}
 nwtoken: {{NW_TOKEN}}
+mainlanguage: ms
+
+###
+
+GET /api/v1/me/name HTTP/1.1
+host: {{host}}
+nwtoken: {{NW_TOKEN}}
+mainlanguage: zh
+
 
 
 ###

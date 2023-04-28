@@ -14,6 +14,7 @@ import (
 )
 
 type Handler[T any] func(Request req.Request[T]) (Response resp.Response)
+type Middleware = Handler[any]
 
 func (h Handler[T]) AsGinHandler() gin.HandlerFunc {
 	l := logger.For("handler")

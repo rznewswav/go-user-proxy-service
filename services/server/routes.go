@@ -8,6 +8,7 @@ import (
 func registerRoutes() {
 	registerController(health.GetHealthController)
 	registerController(examples.GetProfileInfo)
+	registerController(examples.GetUserNameTranslate)
 	registerController(examples.ConcatenateProfileInfo)
 	registerController(examples.PostProfileWithStruct)
 }

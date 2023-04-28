@@ -8,7 +8,7 @@ import (
 	"service/services/server/resp"
 )
 
-var AssignRequestId handlers.Handler[any] = func(
+var AssignRequestId handlers.Middleware = func(
 	Request req.Request[any],
 ) (Response resp.Response) {
 	existingRequestId, _ := Request.Get(constants.RequestIdToken)
@@ -19,5 +19,6 @@ var AssignRequestId handlers.Handler[any] = func(
 	idString := id.String()
 
 	Request.Set(constants.RequestIdToken, idString)
-	return nil
+	return resp.N().
+		Header(constants.RequestIdToken, idString)
 }
