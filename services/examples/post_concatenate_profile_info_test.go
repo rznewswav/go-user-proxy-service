@@ -1,10 +1,12 @@
-package users
+package examples
 
 import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"service/services/server/constants"
 	"service/services/server/controllers"
 	"service/services/server/handlers"
+	"service/services/server/middlewares"
 	"service/services/server/req"
 	"service/services/server/resp"
 	"testing"
@@ -17,11 +19,11 @@ func TestConcatenateProfileInfo(t *testing.T) {
 	var MockUserInfo handlers.Handler[any] = func(
 		Request req.Request[any],
 	) (Response resp.Response) {
-		Request.Set(UserProfileToken, userProfileValue)
+		Request.Set(constants.UserProfile, userProfileValue)
 		return nil
 	}
 
-	mockController.ReplaceMiddleware(&AuthMiddleware, &MockUserInfo)
+	mockController.ReplaceMiddleware(&middlewares.AuthMiddleware, &MockUserInfo)
 	response, status, _ := mockController.SendMockRequest(
 		controllers.MockBody(map[string]interface{}{"hello": "world"}),
 	)

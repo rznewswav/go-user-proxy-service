@@ -19,35 +19,31 @@ func NewController[T any]() Controller[T] {
 	return Controller[T]{}
 }
 
-func C[T any]() Controller[T] {
-	return NewController[T]()
-}
-
-func (c Controller[T]) Get(Route string) Controller[T] {
+func Get(Route string) (c Controller[any]) {
 	c.Method = GET
 	c.Route = Route
 	return c
 }
 
-func (c Controller[T]) Post(Route string) Controller[T] {
+func Post[T any](Route string) (c Controller[T]) {
 	c.Method = POST
 	c.Route = Route
 	return c
 }
 
-func (c Controller[T]) Put(Route string) Controller[T] {
+func Put[T any](Route string) (c Controller[T]) {
 	c.Method = PUT
 	c.Route = Route
 	return c
 }
 
-func (c Controller[T]) Patch(Route string) Controller[T] {
+func Patch[T any](Route string) (c Controller[T]) {
 	c.Method = PATCH
 	c.Route = Route
 	return c
 }
 
-func (c Controller[T]) Delete(Route string) Controller[T] {
+func Delete[T any](Route string) (c Controller[T]) {
 	c.Method = DELETE
 	c.Route = Route
 	return c

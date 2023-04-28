@@ -1,21 +1,21 @@
-package users
+package middlewares
 
 import (
 	"net/http"
+	"service/services/server/constants"
 	"service/services/server/handlers"
 	"service/services/server/req"
 	"service/services/server/resp"
 	t "service/services/translations"
+	"service/services/users"
 )
-
-const UserProfileToken = "user"
 
 var AuthMiddleware handlers.Handler[any] = func(
 	body req.Request[any],
 ) (Response resp.Response) {
 	nwToken := body.Header("nwtoken")
 
-	success, profile := GetUserProfile(nwToken)
+	success, profile := users.GetUserProfile(nwToken)
 	if !success {
 		return resp.F(
 			"NOT_AUTHORIZED",
@@ -24,6 +24,6 @@ var AuthMiddleware handlers.Handler[any] = func(
 			Status(http.StatusForbidden)
 	}
 
-	body.Set(UserProfileToken, profile)
+	body.Set(constants.UserProfile, profile)
 	return
 }

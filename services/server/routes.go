@@ -1,13 +1,13 @@
 package server
 
 import (
+	"service/services/examples"
 	"service/services/health"
-	"service/services/users"
 )
 
 func registerRoutes() {
 	registerController(health.GetHealthController)
-	registerController(users.GetProfileInfo)
-	registerController(users.ConcatenateProfileInfo)
-	registerController(users.PostProfileWithStruct)
+	registerController(examples.GetProfileInfo)
+	registerController(examples.ConcatenateProfileInfo)
+	registerController(examples.PostProfileWithStruct)
 }

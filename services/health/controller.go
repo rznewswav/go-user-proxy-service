@@ -1,7 +1,6 @@
 package health
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"service/services/server/controllers"
 	"service/services/server/handlers"
@@ -12,7 +11,7 @@ import (
 
 var wasLastHealthy = false
 
-var GetHealthController = controllers.C[any]().
+var GetHealthController = controllers.
 	Get("/api/health").
 	Handle(func(
 		body req.Request[any],
@@ -28,9 +27,7 @@ var GetHealthController = controllers.C[any]().
 					"SERVICE_UNAVAILABLE",
 					t.GenericErrorTitle,
 					t.GenericErrorMessage,
-					gin.H{
-						"health": isHealthy,
-					},
+					isHealthy,
 				).
 				Status(http.StatusServiceUnavailable)
 		} else {
