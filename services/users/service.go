@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"service/services/bugsnag"
 	"service/services/config"
 	"service/services/logger"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -35,7 +37,10 @@ var GetUserProfile = func(nwToken string) (
 	profile AppUserType,
 ) {
 	logger := logger.For("users")
-	request, requestInitError := http.NewRequest(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	request, requestInitError := http.NewRequestWithContext(
+		ctx,
 		"GET",
 		nwApiGetUserInfoEndpoint,
 		nil,
