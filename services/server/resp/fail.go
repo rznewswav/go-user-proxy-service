@@ -1,7 +1,6 @@
 package resp
 
 import (
-	"github.com/gin-gonic/gin"
 	"service/services/translations"
 )
 
@@ -20,7 +19,7 @@ func (r response) Message(message t.TranslationKey) Response {
 	return r
 }
 
-func Fail(code string, title, message t.TranslationKey, data gin.H) Response {
+func Fail(code string, title, message t.TranslationKey, data ...any) Response {
 	r := S(data).(response)
 	r.success = false
 	r.code = code
@@ -30,10 +29,6 @@ func Fail(code string, title, message t.TranslationKey, data gin.H) Response {
 }
 
 // F alias for resp.Fail
-func F(code string, title, message t.TranslationKey, data ...gin.H) Response {
-	var datum gin.H
-	if len(data) > 0 {
-		datum = data[0]
-	}
-	return Fail(code, title, message, datum)
+func F(code string, title, message t.TranslationKey, data ...any) Response {
+	return Fail(code, title, message, data...)
 }

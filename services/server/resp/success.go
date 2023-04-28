@@ -121,12 +121,8 @@ func (r response) Success() bool {
 }
 
 // S alias for resp.Success
-func S(data ...gin.H) Response {
-	var datum gin.H
-	if len(data) > 0 {
-		datum = data[0]
-	}
-	return Success(datum)
+func S(data ...any) Response {
+	return Success(makeGinH(data...))
 }
 
 func Success(data gin.H) Response {
