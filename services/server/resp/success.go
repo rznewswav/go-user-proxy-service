@@ -6,12 +6,18 @@ import (
 	"service/services/common/structs"
 )
 
+type Payload struct {
+	Status int
+	Header structs.StringDefaultedMap
+	Data   gin.H
+}
 type Response interface {
 	Success() bool
 	Status(int) Response
 	Header(string, string) Response
 	Send(ctx *gin.Context)
 	Next() bool
+	GetResponsePayload() Payload
 }
 
 type s struct {
@@ -20,15 +26,27 @@ type s struct {
 	header structs.StringDefaultedMap
 }
 
+func (s s) GetResponsePayload() Payload {
+	return Payload{
+		Status: s.status,
+		Header: s.header,
+		Data: gin.H{
+			"success": s.Success(),
+			"data":    s.data,
+		},
+	}
+}
+
 func (s s) Next() bool {
 	return false
 }
 
 func (s s) Send(ctx *gin.Context) {
-	s.header.ForEach(func(key, value string) {
+	payload := s.GetResponsePayload()
+	payload.Header.ForEach(func(key, value string) {
 		ctx.Header(key, value)
 	})
-	ctx.JSON(s.status, s.data)
+	ctx.JSON(payload.Status, payload.Data)
 }
 
 func (s s) Status(i int) Response {

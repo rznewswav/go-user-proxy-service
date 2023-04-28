@@ -11,10 +11,11 @@ func (n n) Next() bool {
 }
 
 func (n n) Send(ctx *gin.Context) {
-	n.header.ForEach(func(key, value string) {
+	payload := n.GetResponsePayload()
+	payload.Header.ForEach(func(key, value string) {
 		ctx.Header(key, value)
 	})
-	ctx.Status(n.status)
+	ctx.Status(payload.Status)
 	ctx.Next()
 }
 

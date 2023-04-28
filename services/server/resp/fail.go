@@ -64,10 +64,11 @@ func (f f) applyTitleMessageTranslation(ctx *gin.Context) {
 
 func (f f) Send(ctx *gin.Context) {
 	f.applyTitleMessageTranslation(ctx)
-	f.header.ForEach(func(key, value string) {
+	payload := f.GetResponsePayload()
+	payload.Header.ForEach(func(key, value string) {
 		ctx.Header(key, value)
 	})
-	ctx.AbortWithStatusJSON(f.status, f.data)
+	ctx.AbortWithStatusJSON(payload.Status, payload.Data)
 }
 
 func Fail(data gin.H) ErrorResponse {
