@@ -27,12 +27,12 @@ func TestConcatenateProfileInfo(t *testing.T) {
 	)
 	assert.Equal(t, http.StatusOK, status)
 	assert.Contains(t, response, "body")
-	body := response.(map[string]interface{})["body"]
+	body := response["body"]
 	assert.Contains(t, body, "hello")
 	hello := body.(map[string]interface{})["hello"]
 	assert.Equal(t, hello, "world")
 
 	assert.Contains(t, response, "profile")
-	profile := response.(map[string]interface{})["profile"]
+	profile := response["profile"]
 	assert.Equal(t, userProfileValue, profile)
 }
